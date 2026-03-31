@@ -1,0 +1,40 @@
+boundary: 6
+name: Logging
+priority: P1
+complexity: trivial
+api_count: 4
+kernel_shared: true  # OH V7 + AOSP V15 = Linux 6.6
+
+apis:
+  - name: logDebug
+    jni_sig: "void logDebug(String tag, String msg)"
+    android: "android.util.Log.d(tag, msg)"
+    oh: "OH_LOG_DEBUG(LOG_APP, tag, msg)"
+    mock: "printf('[D] %s: %s\n', tag, msg)"
+    confidence: 0.99
+
+  - name: logInfo
+    jni_sig: "void logInfo(String tag, String msg)"
+    android: "android.util.Log.i(tag, msg)"
+    oh: "OH_LOG_INFO(LOG_APP, tag, msg)"
+    mock: "printf('[I] %s: %s\n', tag, msg)"
+    confidence: 0.99
+
+  - name: logWarn
+    jni_sig: "void logWarn(String tag, String msg)"
+    android: "android.util.Log.w(tag, msg)"
+    oh: "OH_LOG_WARN(LOG_APP, tag, msg)"
+    mock: "printf('[W] %s: %s\n', tag, msg)"
+    confidence: 0.99
+
+  - name: logError
+    jni_sig: "void logError(String tag, String msg)"
+    android: "android.util.Log.e(tag, msg)"
+    oh: "OH_LOG_ERROR(LOG_APP, tag, msg)"
+    mock: "printf('[E] %s: %s\n', tag, msg)"
+    confidence: 0.99
+
+verification:
+  agent_confirmable: true
+  method: "hilog 输出包含 tag+msg → Agent grep 确认"
+  device_required: false

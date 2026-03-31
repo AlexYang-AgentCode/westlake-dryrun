@@ -1,0 +1,11 @@
+build/
+*.apk
+*.hap
+*.p12
+*.keystore
+node_modules/
+.hvigor/
+__pycache__/
+*.pyc
+local.properties
+signing/

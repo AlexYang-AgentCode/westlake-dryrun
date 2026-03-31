@@ -1,0 +1,2286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WestlakeV3 - 42 Deliverables Plan</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --sidebar-bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --border: #e0e0e0;
+  --text: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #888;
+  --accent: #2563eb;
+  --accent-light: #dbeafe;
+  --green: #16a34a;
+  --green-light: #dcfce7;
+  --orange: #ea580c;
+  --orange-light: #fff7ed;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --red: #dc2626;
+  --red-light: #fef2f2;
+  --cyan: #0891b2;
+  --cyan-light: #ecfeff;
+  --tag-phase0: #6366f1;
+  --tag-demo1: #2563eb;
+  --tag-demo2: #16a34a;
+  --tag-demo3: #ea580c;
+  --tag-device: #7c3aed;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+/* Sidebar */
+#sidebar { width: 320px; min-width: 320px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+#sidebar-header { padding: 16px; border-bottom: 1px solid var(--border); }
+#sidebar-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+#sidebar-header p { font-size: 12px; color: var(--text-muted); }
+#sidebar-nav { flex: 1; overflow-y: auto; padding: 8px; }
+
+.phase-group { margin-bottom: 8px; }
+.phase-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 8px 4px; color: var(--text-muted); }
+.phase-label.p0 { color: var(--tag-phase0); }
+.phase-label.d1 { color: var(--tag-demo1); }
+.phase-label.d2 { color: var(--tag-demo2); }
+.phase-label.d3 { color: var(--tag-demo3); }
+.phase-label.dv { color: var(--tag-device); }
+
+.nav-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; line-height: 1.4; transition: background 0.15s; display: flex; align-items: baseline; gap: 8px; }
+.nav-item:hover { background: #e8e8e8; }
+.nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.nav-item .num { font-weight: 700; min-width: 24px; font-size: 12px; color: var(--text-muted); }
+.nav-item.active .num { color: var(--accent); }
+.nav-item .title { flex: 1; }
+.nav-item .steps-badge { font-size: 10px; background: #e5e7eb; color: var(--text-muted); padding: 1px 6px; border-radius: 10px; white-space: nowrap; }
+.nav-item.active .steps-badge { background: var(--accent); color: white; }
+.nav-item.overview-btn { font-weight: 700; background: #f0f0f0; margin-bottom: 8px; justify-content: center; }
+.nav-item.overview-btn.active { background: var(--accent); color: white; }
+
+/* Main Panel */
+#main { flex: 1; overflow-y: auto; padding: 32px 40px; }
+
+/* Overview */
+#overview { display: none; }
+#overview.visible { display: block; }
+#overview h2 { font-size: 24px; margin-bottom: 24px; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card { background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+.stat-card .val { font-size: 28px; font-weight: 800; color: var(--accent); }
+.stat-card .label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.gantt-container { margin-bottom: 32px; }
+.gantt-container h3 { font-size: 16px; margin-bottom: 12px; }
+.gantt { width: 100%; border-collapse: collapse; font-size: 12px; }
+.gantt th, .gantt td { padding: 6px 8px; border: 1px solid var(--border); text-align: left; }
+.gantt th { background: var(--sidebar-bg); font-weight: 600; }
+.gantt .bar { height: 18px; border-radius: 4px; display: inline-block; }
+.gantt .bar.p0 { background: var(--tag-phase0); }
+.gantt .bar.d1 { background: var(--tag-demo1); }
+.gantt .bar.d2 { background: var(--tag-demo2); }
+.gantt .bar.d3 { background: var(--tag-demo3); }
+.gantt .bar.dv { background: var(--tag-device); }
+
+.comparison-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 32px; }
+.comparison-table th, .comparison-table td { padding: 8px 12px; border: 1px solid var(--border); }
+.comparison-table th { background: var(--sidebar-bg); font-weight: 600; }
+.comparison-table td:first-child { font-weight: 600; }
+
+.deliverable-summary { width: 100%; border-collapse: collapse; font-size: 12px; }
+.deliverable-summary th, .deliverable-summary td { padding: 6px 10px; border: 1px solid var(--border); }
+.deliverable-summary th { background: var(--sidebar-bg); font-weight: 600; position: sticky; top: 0; }
+.deliverable-summary tr:hover { background: #f5f5f5; }
+.deliverable-summary .clickable { cursor: pointer; color: var(--accent); text-decoration: underline; }
+
+/* Deliverable Card */
+.card { display: none; }
+.card.visible { display: block; }
+
+.card-header { margin-bottom: 24px; }
+.card-header .card-num { font-size: 48px; font-weight: 900; color: var(--accent); line-height: 1; }
+.card-header .card-title { font-size: 24px; font-weight: 700; margin-top: 4px; }
+.card-tags { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.tag.phase { background: #eef2ff; color: var(--tag-phase0); }
+.tag.demo1 { background: var(--accent-light); color: var(--tag-demo1); }
+.tag.demo2 { background: var(--green-light); color: var(--tag-demo2); }
+.tag.demo3 { background: var(--orange-light); color: var(--tag-demo3); }
+.tag.device { background: var(--purple-light); color: var(--tag-device); }
+.tag.day { background: #fef3c7; color: #92400e; }
+.tag.machine { background: var(--cyan-light); color: var(--cyan); }
+.tag.duration { background: #f3f4f6; color: var(--text-secondary); }
+
+.section { margin-bottom: 20px; }
+.section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid var(--border); }
+.section-body { font-size: 14px; line-height: 1.7; }
+.section-body ul { padding-left: 20px; }
+.section-body li { margin-bottom: 4px; }
+.section-body code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 13px; font-family: 'Cascadia Code', 'Fira Code', monospace; }
+
+.cmd-block { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 14px 16px; margin: 8px 0; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 12px; line-height: 1.6; position: relative; white-space: pre-wrap; word-break: break-all; }
+.cmd-block .copy-btn { position: absolute; top: 8px; right: 8px; background: #475569; color: #e2e8f0; border: none; border-radius: 4px; padding: 4px 10px; font-size: 11px; cursor: pointer; transition: background 0.15s; }
+.cmd-block .copy-btn:hover { background: #64748b; }
+.cmd-block .copy-btn.copied { background: var(--green); }
+
+.ref-list { list-style: none; padding: 0; }
+.ref-list li { padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+.ref-list li:last-child { border-bottom: none; }
+.ref-list .ref-path { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 11px; color: var(--accent); background: var(--accent-light); padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 2px; word-break: break-all; }
+.ref-list .ref-label { font-weight: 600; }
+
+.parallel-box { background: var(--cyan-light); border: 1px solid #a5f3fc; border-radius: 8px; padding: 12px 16px; font-size: 13px; }
+.parallel-box strong { color: var(--cyan); }
+
+.original-steps { background: #f8f9fa; border-radius: 6px; padding: 8px 12px; font-size: 12px; color: var(--text-muted); }
+
+/* Keyboard hint */
+#kbd-hint { position: fixed; bottom: 16px; right: 16px; background: rgba(0,0,0,0.75); color: white; padding: 8px 14px; border-radius: 8px; font-size: 11px; z-index: 100; }
+#kbd-hint kbd { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px; margin: 0 2px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  #sidebar { width: 260px; min-width: 260px; }
+  #main { padding: 20px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>WestlakeV3 Plan</h1>
+    <p>42 Deliverables / 320 Steps / 7 Days</p>
+  </div>
+  <div id="sidebar-nav">
+    <div class="nav-item overview-btn active" onclick="showOverview()">Overview</div>
+    <!-- Phase 0 -->
+    <div class="phase-group">
+      <div class="phase-label p0">Phase 0 - Infrastructure (D1)</div>
+    </div>
+    <!-- Demo 1 -->
+    <div class="phase-group">
+      <div class="phase-label d1">Demo 1 - HelloWorld (D2-D3)</div>
+    </div>
+    <!-- Demo 2 -->
+    <div class="phase-group">
+      <div class="phase-label d2">Demo 2 - Calculator (D4)</div>
+    </div>
+    <!-- Demo 3 -->
+    <div class="phase-group">
+      <div class="phase-label d3">Demo 3 - Self-Healing (D5-D6)</div>
+    </div>
+    <!-- Device -->
+    <div class="phase-group">
+      <div class="phase-label dv">Device Verification (D7)</div>
+    </div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="overview" class="visible"></div>
+  <div id="card-container"></div>
+</div>
+
+<div id="kbd-hint"><kbd>&larr;</kbd><kbd>&rarr;</kbd> Switch &nbsp; <kbd>Esc</kbd> Overview</div>
+
+<script>
+// ============================================================
+// DATA - 42 deliverables
+// ============================================================
+const deliverables = [
+// ---- Phase 0 ----
+{
+  id:1, num:"#1", title:"D200+D600 Device Snapshots", phase:"Phase 0", phaseClass:"phase", day:"D1", steps:"1-5", duration:"3h",
+  machines:["Local USB","D200 (OH V7)","D600 (AOSP V15)"],
+  input:[
+    "D200 board (RK3568, OH V7.0, API 25, hdc)",
+    "D600 board (UIS7885, AOSP V15, adb)",
+    "USB cables + host machine"
+  ],
+  output:[
+    "snapshots/d200/ (20+ system files: /proc/cpuinfo, /system/build.prop, ...)",
+    "snapshots/d600/ (20+ system files)",
+    "api-behaviors/45-api-baseline.json (45 API behavior recordings)",
+    "kernel-comparison.md (Linux 6.6 shared kernel analysis)"
+  ],
+  verify:[
+    "20+ files captured per device",
+    "45 API behaviors recorded in JSON",
+    "Linux 6.6 kernel version confirmed on both"
+  ],
+  commands:[
+    {label:"Connect D200", cmd:"hdc list targets\nhdc shell cat /proc/version\nhdc shell getprop ro.build.display.id"},
+    {label:"Connect D600", cmd:"adb devices\nadb shell cat /proc/version\nadb shell getprop ro.build.display.id"},
+    {label:"Capture D200 snapshot", cmd:"mkdir -p snapshots/d200\nhdc shell cat /proc/cpuinfo > snapshots/d200/cpuinfo.txt\nhdc shell cat /system/build.prop > snapshots/d200/build.prop\nhdc shell ls -la /system/lib64/ > snapshots/d200/lib64-list.txt"},
+    {label:"Record API behaviors", cmd:"python3 tools/record-api-behaviors.py --device=d200 --apis=45\npython3 tools/record-api-behaviors.py --device=d600 --apis=45"}
+  ],
+  parallel:{text:"GZ02 编译 string_bridge (#3) + GZ05 验证 ART .so (#3) + HK01 建 GitHub 仓库 (#5)。本地 PC 在 D200/D600 采集快照期间，同步编写 mock-hdc/verify.py。", machines:["本地PC","GZ02","GZ05","HK01"]},
+  refs:[
+    {label:"Project device specs", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 28-36)"},
+    {label:"D200 devkit info", path:"MEMORY: project_dayu200_devkit.md (RK3568, 4-core, 2G)"},
+    {label:"D600 devkit info", path:"MEMORY: project_dayu600_devkit.md (UIS7885, dual-system)"},
+    {label:"Dual Device Lab", path:"19.Document/19.4.Adapter-History/DUAL-DEVICE-LAB.md"},
+    {label:"H35 Wine dual-env approach", path:"19.Document/19.4.Adapter-History/H35-Wine/"}
+  ]
+},
+{
+  id:2, num:"#2", title:"Mock Infrastructure", phase:"Phase 0", phaseClass:"phase", day:"D1", steps:"6-10", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "snapshots/d200/ and snapshots/d600/",
+    "api-behaviors/45-api-baseline.json"
+  ],
+  output:[
+    "tools/mock-hdc.sh (snapshot-based replay)",
+    "tools/mock-adb.sh",
+    "tools/api-replay-engine.py",
+    "reports/behavior-diff.html (D200 vs D600 diff)"
+  ],
+  verify:[
+    "mock-hdc shell cat /proc/version returns D200 snapshot",
+    "API replay engine replays 45 behaviors correctly",
+    "Behavior diff report generated"
+  ],
+  commands:[
+    {label:"Generate mocks", cmd:"python3 tools/generate-mocks.py --snapshot-dir=snapshots/\n# Test mock-hdc\nbash tools/mock-hdc.sh shell cat /proc/version"},
+    {label:"Run behavior diff", cmd:"python3 tools/api-replay-engine.py --compare d200 d600 --output reports/behavior-diff.html"}
+  ],
+  parallel:{text:"GZ02 编写 Mock 同时，GZ05 运行 Build Pipeline (#3) + 验证已有 .so。HK01 同步搭建 GitHub (#5)。1h 编译等待期间本地 PC 编写 api-replay-engine.py。", machines:["GZ02","GZ05","HK01","本地PC"]},
+  refs:[
+    {label:"PC-DEV-STRATEGY (mock-first approach)", path:"19.Document/19.4.Adapter-History/PC-DEV-STRATEGY.md"},
+    {label:"History: H35 Wine test isolation", path:"19.Document/19.4.Adapter-History/H35-Wine/"},
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"}
+  ]
+},
+{
+  id:3, num:"#3", title:"Build Pipeline", phase:"Phase 0", phaseClass:"phase", day:"D1", steps:"11-15", duration:"3h",
+  machines:["GZ05"],
+  input:[
+    "HanBing AdapterCode build scripts",
+    "Existing .so/.jar artifacts",
+    "string_bridge source (809-line RAII C)"
+  ],
+  output:[
+    "adapter/ project directory (15 plugin groups)",
+    "build/config.sh (AOSP_ROOT, OH_ROOT, OH_CLANG paths)",
+    "build/build.sh (--target=logging / --target=all)",
+    "out/string_bridge.so (x86 + aarch64 verified)",
+    "adapter/out/ (collected existing artifacts)"
+  ],
+  verify:[
+    "build.sh --target=string_bridge compiles without error",
+    "readelf -h out/string_bridge.so shows correct arch",
+    "nm out/string_bridge.so | grep jstring shows Bridge symbols"
+  ],
+  commands:[
+    {label:"Setup directory", cmd:"mkdir -p adapter/{plugins,build,out,tests}\nfor i in $(seq -w 1 15); do mkdir -p adapter/plugins/$i; done"},
+    {label:"Compile string_bridge", cmd:"source build/config.sh\n$OH_CLANG --target=aarch64-linux-ohos \\\n  -shared -fPIC -o out/string_bridge.so \\\n  00-Infrastructure/string_bridge/string_bridge.c\nreadelf -h out/string_bridge.so"},
+    {label:"Collect existing artifacts", cmd:"bash build/collect_artifacts.sh\nls -la adapter/out/"}
+  ],
+  parallel:{text:"GZ05 编译 string_bridge + 收集产物，同时本地 PC 采集设备快照 (#1)，GZ02 编写 Mock (#2)，HK01 建 GitHub (#5)。编译 1h 等待时写 build.sh + config.sh。", machines:["GZ05","本地PC","GZ02","HK01"]},
+  refs:[
+    {label:"HanBing build scripts", path:"16.12-HanBing/AdapterCode/build/"},
+    {label:"HanBing config.sh", path:"16.12-HanBing/AdapterCode/build/config.sh"},
+    {label:"string_bridge source", path:"16.11-Main/WestlakeV3/00-Infrastructure/string_bridge/string_bridge.c"},
+    {label:"string_bridge header", path:"16.11-Main/WestlakeV3/00-Infrastructure/string_bridge/string_bridge.h"},
+    {label:"WINE-INSIGHTS (principle 1: A->W pattern)", path:"16.11-Main/WestlakeV3/00-Infrastructure/WINE-INSIGHTS.md"},
+    {label:"Build and deployment design (Ch 5/9)", path:"16.12-HanBing/2026.03.25/build and deployment design.html"}
+  ]
+},
+{
+  id:4, num:"#4", title:"Verification Toolkit", phase:"Phase 0", phaseClass:"phase", day:"D1", steps:"16-20", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "Build pipeline output",
+    "Mock infrastructure"
+  ],
+  output:[
+    "tools/verify.py (unified: symbols/screenshot/behavior/log/AI-review)",
+    "tools/ralph-loop.sh (self-healing build engine)",
+    "tools/confidence_gate.py (threshold > 0.85)",
+    "tools/deploy.sh (default=mock, --real for device)",
+    "End-to-end pipeline test PASS"
+  ],
+  verify:[
+    "verify.py --check=symbols on string_bridge.so passes",
+    "ralph-loop.sh can recover from intentional compile error",
+    "deploy.sh --dry-run completes without error"
+  ],
+  commands:[
+    {label:"Test verify.py", cmd:"python3 tools/verify.py --check=symbols --target=out/string_bridge.so"},
+    {label:"Test ralph-loop", cmd:"bash tools/ralph-loop.sh --target=string_bridge --max-retries=3"},
+    {label:"Test deploy", cmd:"bash tools/deploy.sh --dry-run --mock"}
+  ],
+  parallel:{text:"GZ02 验证产物，同时 GZ05 继续预编译 OH 补丁 (#14)，HK01 完成 GitHub workflows (#5)，本地 PC 编写 confidence_gate.py + ralph-loop.sh。", machines:["GZ02","GZ05","HK01","本地PC"]},
+  refs:[
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"},
+    {label:"AI Pattern D05 LLM-as-Judge", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern D05)"},
+    {label:"Confidence gate design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 248)"}
+  ]
+},
+{
+  id:5, num:"#5", title:"GitHub Automation", phase:"Phase 0", phaseClass:"phase", day:"D1", steps:"21-25", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "adapter/ project directory",
+    "CI/CD workflow templates"
+  ],
+  output:[
+    "GitHub repo: westlake-adapter",
+    ".github/workflows/ci.yml (PR trigger: compile+mock-test+SSIM)",
+    ".github/workflows/auto-fix.yml (Issue trigger: AI analyze->fix->PR)",
+    ".github/workflows/release.yml (Tag trigger: package->Release)",
+    "Issue templates + PR templates + CODEOWNERS"
+  ],
+  verify:[
+    "gh repo view westlake-adapter shows repo exists",
+    "Push test commit -> CI workflow triggers",
+    "Create test Issue -> auto-fix workflow triggers"
+  ],
+  commands:[
+    {label:"Create repo", cmd:"gh repo create westlake-adapter --private --clone\ncd westlake-adapter"},
+    {label:"Setup workflows", cmd:"mkdir -p .github/workflows .github/ISSUE_TEMPLATE\n# Copy workflow files\ncp templates/ci.yml .github/workflows/\ncp templates/auto-fix.yml .github/workflows/\ncp templates/release.yml .github/workflows/"},
+    {label:"Test CI", cmd:"git add . && git commit -m 'chore: initial setup'\ngit push origin main\ngh run list --limit 1"}
+  ],
+  parallel:{text:"HK01 搭建 GitHub 仓库/CI，同时 GZ02 编写 Mock (#2) + verify (#4)，GZ05 编译 Build Pipeline (#3)，本地 PC 采集设备快照 (#1)。", machines:["HK01","GZ02","GZ05","本地PC"]},
+  refs:[
+    {label:"Claude Code Action", path:"github.com/anthropics/claude-code-action (GitHub Action)"},
+    {label:"H63 AWS Q auto-remediation", path:"19.Document/19.4.Adapter-History/ (H63 pattern)"},
+    {label:"AI Pattern C08 CI Self-Heal", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern C08)"},
+    {label:"25 CI repos reference", path:"MEMORY: reference_claude_code_ci_repos.md"}
+  ]
+},
+{
+  id:6, num:"#6", title:"Phase 0 Gate", phase:"Phase 0", phaseClass:"phase", day:"D1", steps:"26-30", duration:"1h",
+  machines:["Local"],
+  input:[
+    "All Phase 0 outputs",
+    "Mock infrastructure",
+    "Build pipeline",
+    "GitHub repo"
+  ],
+  output:[
+    "Phase 0 gate report (PASS/FAIL)",
+    "3 Demo acceptance criteria doc",
+    "AI Agent collaboration rules",
+    "Demo 3 bug script (SharedPreferences reproduction steps)"
+  ],
+  verify:[
+    "Mock-hdc works? YES",
+    "Build pipeline compiles? YES",
+    "GitHub Actions trigger? YES",
+    "All 3 criteria GREEN -> proceed to Demo 1"
+  ],
+  commands:[
+    {label:"Gate check", cmd:"python3 tools/confidence_gate.py --phase=0\n# Expected: PHASE_0_GATE: PASS"}
+  ],
+  parallel:{text:"串行 Gate 检查，但利用等待时间：GZ02 预编译 OH 补丁 libabilityms.z.so (#14)，GZ05 预编译 ART (#14)，为 D2 争取时间。", machines:["本地PC","GZ02","GZ05"]},
+  refs:[
+    {label:"Gate design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 263-271)"},
+    {label:"Demo 3 scenario", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 486-496)"}
+  ]
+},
+// ---- Demo 1: HelloWorld ----
+{
+  id:7, num:"#7", title:"Logging Bridge (4 API)", phase:"Demo 1", phaseClass:"demo1", day:"D2", steps:"31-44", duration:"3h",
+  machines:["GZ02","GZ05"],
+  input:[
+    "api-spec: 01-Logging/api-spec.yaml",
+    "string_bridge.so (from #3)",
+    "Mock infrastructure (from #2)",
+    "D600 behavior baseline for logDebug/Info/Warn/Error"
+  ],
+  output:[
+    "plugins/01-logging/mock.c (printf-based, host-runnable)",
+    "plugins/01-logging/bridge.c (JNI -> OH HiLog, uses string_bridge RAII)",
+    "plugins/01-logging/test/ (4 API x 4 cases = 16 tests: empty/normal/Chinese/emoji)",
+    "plugins/01-logging/bridge.so (linked into adapter)",
+    "reports/logging-behavior-diff.json"
+  ],
+  verify:[
+    "16/16 unit tests pass",
+    "API behavior matches D600 baseline (JSON diff = 0)",
+    "LLM-as-Judge: patch review APPROVE",
+    "nm bridge.so | grep -c 'JNI.*log' == 4",
+    "Concurrent + stress + memory leak tests pass"
+  ],
+  commands:[
+    {label:"Compile mock", cmd:"gcc -shared -fPIC -o plugins/01-logging/mock.so \\\n  plugins/01-logging/mock.c"},
+    {label:"Compile bridge", cmd:"source build/config.sh\n$OH_CLANG --target=aarch64-linux-ohos -shared -fPIC \\\n  -I 00-Infrastructure/string_bridge/ \\\n  -o plugins/01-logging/bridge.so \\\n  plugins/01-logging/bridge.c \\\n  -lhilog_ndk -L$OH_SYSROOT/usr/lib"},
+    {label:"Run tests", cmd:"python3 tools/verify.py --plugin=01-logging --check=all"},
+    {label:"LLM-as-Judge", cmd:"python3 tools/llm-judge.py --target=plugins/01-logging/bridge.c \\\n  --criteria='RAII string handling, no leaks, HiLog mapping correct'"}
+  ],
+  parallel:{text:"GZ02 编译 Logging .so (5min)，同时 GZ05 运行 JVM 测试 16 用例，本地 PC 开始写 Activity Mock (#8)。编译极快无需等待。GZ01 nm 验证符号表。", machines:["GZ02","GZ05","本地PC","GZ01"]},
+  refs:[
+    {label:"Wine A->W pattern (WINE-INSIGHTS principle 1)", path:"16.11-Main/WestlakeV3/00-Infrastructure/WINE-INSIGHTS.md"},
+    {label:"STRING_BRIDGE_USAGE (RAII pattern)", path:"16.11-Main/WestlakeV3/00-Infrastructure/string_bridge/string_bridge.h"},
+    {label:"Boundary 6 (Logging, 2 methods)", path:"16.21-Diff/15-boundaries.md (boundary 6)"},
+    {label:"Yue OHBridge reference", path:"16.13-Yue/westlake/ (Bridge implementation patterns)"},
+    {label:"Logging api-spec", path:"16.11-Main/WestlakeV3/01-Logging/api-spec.yaml"},
+    {label:"AI Pattern D05 LLM-as-Judge", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern D05)"},
+    {label:"H35 Wine string conversion", path:"19.Document/19.4.Adapter-History/H35-Wine/ (string handling)"}
+  ]
+},
+{
+  id:8, num:"#8", title:"Activity Mock Layer", phase:"Demo 1", phaseClass:"demo1", day:"D2", steps:"46-50", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "02-Activity/api-spec.yaml",
+    "D600 Activity lifecycle behavior baseline",
+    "AOSP ActivityThread source reference"
+  ],
+  output:[
+    "plugins/02-activity/mock/MiniActivityManager.java (state machine)",
+    "plugins/02-activity/mock/IntentWantConverter.java",
+    "plugins/02-activity/test/ (50 test cases)",
+    "State machine diagram: CREATED->STARTED->RESUMED->PAUSED->STOPPED->DESTROYED"
+  ],
+  verify:[
+    "50/50 lifecycle tests pass",
+    "State machine covers all 6 states + transitions",
+    "IntentWantConverter handles: explicit/implicit/data/extras"
+  ],
+  commands:[
+    {label:"Run mock tests", cmd:"python3 tools/verify.py --plugin=02-activity --check=mock \\\n  --cases=50"}
+  ],
+  parallel:{text:"GZ02 写 Activity Mock 50 用例，同时 GZ05 编译 Activity Bridge (#9, 1h)。编译等待 1h 内本地 PC 写 Window Mock (#16)。GZ01 验证 Logging 符号。", machines:["GZ02","GZ05","本地PC","GZ01"]},
+  refs:[
+    {label:"Activity api-spec", path:"16.11-Main/WestlakeV3/02-Activity/api-spec.yaml"},
+    {label:"Boundary 1 (Activity lifecycle)", path:"16.21-Diff/15-boundaries.md (boundary 1)"},
+    {label:"AOSP ActivityThread", path:"19.Document/19.2A.AOSP-V10/ (ActivityThread.java)"},
+    {label:"HanBing overall design", path:"16.12-HanBing/2026.03.18/overall_design.html"}
+  ]
+},
+{
+  id:9, num:"#9", title:"Activity Bridge: startAbility", phase:"Demo 1", phaseClass:"demo1", day:"D2", steps:"51-58", duration:"4h",
+  machines:["GZ05 Docker"],
+  input:[
+    "Activity Mock layer (from #8)",
+    "HanBing AdapterCode (AOSP patches + OH patches)",
+    "OH ability_runtime source",
+    "AOSP ActivityThread/ActivityManager source"
+  ],
+  output:[
+    "plugins/02-activity/bridge/oh_ability_manager_client.cpp",
+    "AOSP patches: ActivityThread.java.patch, ActivityManager.java.patch",
+    "OH patches: ability_runtime.patch, appms.patch",
+    "Docker cross-compile artifacts (.so + .z.so)"
+  ],
+  verify:[
+    "Ralph Loop compile succeeds within 3 retries",
+    "nm bridge.so shows startAbility JNI symbol",
+    "AOSP patches: LLM-as-Judge APPROVE (only-add-never-remove)",
+    "OH patches: nm shows only additions vs baseline .z.so"
+  ],
+  commands:[
+    {label:"Apply AOSP patches", cmd:"cd $AOSP_ROOT\ngit apply adapter/patches/aosp/ActivityThread.patch\ngit apply adapter/patches/aosp/ActivityManager.patch"},
+    {label:"Docker cross-compile", cmd:"docker exec gz05-oh-builder bash -c '\n  source build/config.sh\n  bash build/build.sh --target=activity --arch=aarch64\n'"},
+    {label:"Verify symbols", cmd:"nm -D out/liboh_adapter_bridge.so | grep startAbility\nreadelf -d out/liboh_adapter_bridge.so | grep NEEDED"}
+  ],
+  parallel:{text:"GZ05 Docker 交叉编译 Activity Bridge (1h)，同时 GZ02 运行 Mock 测试。编译 1h 内本地 PC 写 Window Bridge (#16) + AOSP 补丁。GZ01 nm 验证 Logging .so。", machines:["GZ05","GZ02","本地PC","GZ01"]},
+  refs:[
+    {label:"Build and deployment design (Ch 5: AOSP patches, Ch 9: OH patches)", path:"16.12-HanBing/2026.03.25/build and deployment design.html"},
+    {label:"Boundary 1 (Activity, 15 methods)", path:"16.21-Diff/15-boundaries.md (boundary 1)"},
+    {label:"HanBing AOSP patches", path:"16.12-HanBing/AdapterCode/aosp_patches/"},
+    {label:"HanBing OH patches", path:"16.12-HanBing/AdapterCode/ohos_patches/"},
+    {label:"HanBing build.sh", path:"16.12-HanBing/AdapterCode/build/build.sh"},
+    {label:"OH ability_runtime source", path:"19.Document/19.1G.HarmonyOS-v7.0.0.18-D200/ (ability_runtime)"},
+    {label:"H04 J2ObjC bridge pattern", path:"19.Document/19.4.Adapter-History/H04-J2ObjC/"},
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"}
+  ]
+},
+{
+  id:10, num:"#10", title:"Activity Verification", phase:"Demo 1", phaseClass:"demo1", day:"D2", steps:"59-62", duration:"1.5h",
+  machines:["GZ02"],
+  input:[
+    "Activity Bridge .so (from #9)",
+    "D600 behavior baseline",
+    "AOSP + OH patches"
+  ],
+  output:[
+    "reports/activity-behavior-comparison.json",
+    "reports/activity-nm-check.txt (symbol verification)",
+    "reports/activity-llm-judge.md (patch review)"
+  ],
+  verify:[
+    "Behavior comparison: 0 differences vs D600 baseline",
+    "nm check: all required symbols present, no removed symbols",
+    "LLM-as-Judge: APPROVE on both AOSP and OH patches"
+  ],
+  commands:[
+    {label:"Behavior comparison", cmd:"python3 tools/verify.py --plugin=02-activity --check=behavior \\\n  --baseline=api-behaviors/d600-activity.json"},
+    {label:"nm symbol check", cmd:"nm -D out/liboh_adapter_bridge.so | grep -E 'startAbility|terminateSelf|checkPermission'"},
+    {label:"LLM-as-Judge patches", cmd:"python3 tools/llm-judge.py \\\n  --target=adapter/patches/aosp/ActivityThread.patch \\\n  --criteria='only-add-never-remove, no security regression'"}
+  ],
+  parallel:{text:"GZ02 行为对比验证，同时 GZ05 继续 JVM 测试 Activity (#11)，本地 PC 同步写 terminateSelf + checkPermission (#11)。GZ03 LLM-Judge 审查补丁。", machines:["GZ02","GZ05","本地PC","GZ03"]},
+  refs:[
+    {label:"AI Pattern D05 LLM-as-Judge", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern D05)"},
+    {label:"Boundary verification method", path:"16.21-Diff/15-boundaries.md"}
+  ]
+},
+{
+  id:11, num:"#11", title:"Activity: terminateSelf + checkPermission", phase:"Demo 1", phaseClass:"demo1", day:"D2", steps:"63-68", duration:"2h",
+  machines:["GZ02","GZ05"],
+  input:[
+    "startAbility Bridge (from #9)",
+    "OH AccessTokenKit API",
+    "Activity lifecycle state machine"
+  ],
+  output:[
+    "plugins/02-activity/bridge/terminate_self.cpp",
+    "plugins/02-activity/bridge/check_permission.cpp",
+    "plugins/02-activity/test/terminate_lifecycle.test (callback verification)",
+    "plugins/02-activity/test/permission.test (GRANTED mock)"
+  ],
+  verify:[
+    "terminateSelf triggers onPause->onStop->onDestroy callbacks",
+    "checkPermission returns GRANTED for mock permissions",
+    "Both compile + link into bridge.so"
+  ],
+  commands:[
+    {label:"Compile remaining APIs", cmd:"bash build/build.sh --target=activity --apis=terminateSelf,checkPermission"},
+    {label:"Run lifecycle tests", cmd:"python3 tools/verify.py --plugin=02-activity --check=lifecycle"}
+  ],
+  parallel:{text:"GZ02 Mock 测试 terminateSelf/checkPermission，GZ05 编译链入 bridge.so。同时本地 PC 写 Window Bridge (#16)，GZ01 nm 验证 Activity 符号。", machines:["GZ02","GZ05","本地PC","GZ01"]},
+  refs:[
+    {label:"OH AccessTokenKit", path:"19.Document/19.1G.HarmonyOS-v7.0.0.18-D200/ (AccessTokenKit)"},
+    {label:"Activity api-spec", path:"16.11-Main/WestlakeV3/02-Activity/api-spec.yaml"}
+  ]
+},
+{
+  id:12, num:"#12", title:"Activity Integration", phase:"Demo 1", phaseClass:"demo1", day:"D2", steps:"69-80", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "All 3 Activity APIs (startAbility, terminateSelf, checkPermission)",
+    "Logging Bridge (from #7)",
+    "50 mock test cases"
+  ],
+  output:[
+    "Integration test results: start->run->terminate chain",
+    "Multi-Activity stack test (A->B->back->A)",
+    "Lifecycle chain verification log",
+    "AI retrospective report: parallel efficiency, Ralph Loop stats",
+    "Progress marker: 7/25 API complete"
+  ],
+  verify:[
+    "Full lifecycle chain: create->start->resume->pause->stop->destroy",
+    "Multi-Activity stack: A starts B, B terminates, A resumes",
+    "All 50 test cases pass in integrated mode",
+    "7/25 API marker updated"
+  ],
+  commands:[
+    {label:"Integration test", cmd:"python3 tools/verify.py --plugin=02-activity --check=integration \\\n  --scenario=multi-activity-stack"},
+    {label:"AI retrospective", cmd:"python3 tools/ai-retrospective.py --phase=activity \\\n  --metrics=parallel-efficiency,ralph-loop-retries"}
+  ],
+  parallel:{text:"GZ02 集成测试 Activity 全链路，同时 GZ05 预编译 Window Bridge (#16, 1h)，本地 PC 开始 Rendering Mock (#17)。GZ03 行为对比 Activity vs D600。", machines:["GZ02","GZ05","本地PC","GZ03"]},
+  refs:[
+    {label:"Activity integration spec", path:"16.11-Main/WestlakeV3/02-Activity/"},
+    {label:"AI Pattern: retrospective", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/"}
+  ]
+},
+{
+  id:13, num:"#13", title:"Compile Line: Verify Existing Artifacts", phase:"Demo 1", phaseClass:"demo1", day:"D2-D3", steps:"81-85", duration:"2h",
+  machines:["GZ05"],
+  input:[
+    "Existing .so files from HanBing AdapterCode/out/",
+    "Existing framework.jar",
+    "OH patched .z.so (4 files)"
+  ],
+  output:[
+    "reports/artifact-audit.html",
+    "readelf output for each .so (AArch64 confirmed)",
+    "nm symbol lists for all artifacts",
+    "framework.jar class list (jar tf)",
+    "Gap analysis: what is missing vs what Demo 1 needs"
+  ],
+  verify:[
+    "libbionic_compat.so: readelf confirms AArch64 + symbols intact",
+    "Layer 2 (10 .so): all nm checks pass",
+    "framework.jar: jar tf shows required Activity/Canvas classes",
+    "OH patches (4 .z.so): nm shows only-add-never-remove vs baseline"
+  ],
+  commands:[
+    {label:"Audit all artifacts", cmd:"for so in adapter/out/native/*.so; do\n  echo \"=== $so ===\"\n  readelf -h $so | grep Machine\n  nm -D $so | wc -l\ndone"},
+    {label:"Check framework.jar", cmd:"jar tf adapter/out/java/framework.jar | grep -E 'Activity|Canvas|Surface' | head -20"},
+    {label:"Verify OH patches", cmd:"for zso in adapter/out/oh-services/*.z.so; do\n  echo \"=== $zso ===\"\n  nm -D $zso | tail -5\ndone"}
+  ],
+  parallel:{text:"GZ05 审计已有产物 readelf/nm，同时 GZ02 开发 Activity Bridge (#9-#12)，本地 PC 写 Window/Rendering Mock。GZ01 同步快照到 NFS。", machines:["GZ05","GZ02","本地PC","GZ01"]},
+  refs:[
+    {label:"HanBing AdapterCode output", path:"16.12-HanBing/AdapterCode/out/"},
+    {label:"HanBing build artifacts", path:"16.12-HanBing/AdapterCode/build/"},
+    {label:"Build and deployment design", path:"16.12-HanBing/2026.03.25/build and deployment design.html"}
+  ]
+},
+{
+  id:14, num:"#14", title:"Compile Line: Build Missing Components", phase:"Demo 1", phaseClass:"demo1", day:"D3", steps:"86-92", duration:"4h",
+  machines:["GZ05 Docker"],
+  input:[
+    "Gap analysis from #13",
+    "AOSP source (for ART, dex2oat)",
+    "OH source (for appspawn-x)",
+    "30 Bridge function implementations"
+  ],
+  output:[
+    "libart.so (if missing, Docker cross-compiled)",
+    "dex2oat binary (if missing)",
+    "libandroid_runtime.so (if missing)",
+    "liboh_adapter_bridge.so (with 30 Bridge JNI functions linked)",
+    "appspawn-x binary + appspawn_x.cfg",
+    "Full link verification (ldd simulation)"
+  ],
+  verify:[
+    "ldd simulation: no broken dependencies",
+    "nm liboh_adapter_bridge.so | grep -c JNI >= 30",
+    "appspawn-x --version returns expected",
+    "Ralph Loop: all builds complete within 3 retries"
+  ],
+  commands:[
+    {label:"Build missing .so", cmd:"docker exec gz05-oh-builder bash -c '\n  bash build/build.sh --target=all --arch=aarch64 --ralph-loop\n'"},
+    {label:"Link 30 Bridge functions", cmd:"$OH_CLANG --target=aarch64-linux-ohos -shared -fPIC \\\n  -o out/liboh_adapter_bridge.so \\\n  plugins/*/bridge.c \\\n  -L$OH_SYSROOT/usr/lib -lhilog_ndk -lace_ndk -lnative_window"},
+    {label:"Verify link chain", cmd:"python3 tools/verify.py --check=link-chain --target=out/"}
+  ],
+  parallel:{text:"GZ05 Docker 重编译缺失组件 (1h+)，同时 GZ02 开发 Window Bridge (#16)，本地 PC 3 路 Swarm 写 Rendering (#17)。编译等待期间 GZ01 验证 Activity 符号。", machines:["GZ05","GZ02","本地PC","GZ01"]},
+  refs:[
+    {label:"HanBing cross-compile script", path:"16.12-HanBing/AdapterCode/build/cross_compile_100pct.sh"},
+    {label:"HanBing deploy script", path:"16.12-HanBing/AdapterCode/build/deploy.sh"},
+    {label:"appspawn-x design", path:"16.12-HanBing/2026.03.18/project/appspawn_x_design.html"},
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"}
+  ]
+},
+{
+  id:15, num:"#15", title:"Compile Line: Patch Verification", phase:"Demo 1", phaseClass:"demo1", day:"D3", steps:"93-100", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "AOSP patches (ActivityThread, ActivityManager)",
+    "OH patches (ability_runtime, appms, BMS, SceneSessionManager)",
+    "Baseline .z.so files from OH V7.0"
+  ],
+  output:[
+    "reports/aosp-patch-review.md (LLM-as-Judge per patch)",
+    "reports/oh-patch-nm-audit.txt (only-add-never-remove for each)",
+    "reports/patch-conflict-check.md (OH V7.0 API 25 compatibility)",
+    "If re-compilation needed: Docker Ralph Loop results"
+  ],
+  verify:[
+    "AOSP patches: LLM-as-Judge APPROVE (2/2)",
+    "OH patches: nm only-add-never-remove (4/4)",
+    "No patch conflicts with OH V7.0 API 25",
+    "If recompiled: readelf confirms correct arch"
+  ],
+  commands:[
+    {label:"LLM-Judge AOSP patches", cmd:"for patch in adapter/patches/aosp/*.patch; do\n  python3 tools/llm-judge.py --target=$patch \\\n    --criteria='only-add-never-remove, security-safe'\ndone"},
+    {label:"nm audit OH patches", cmd:"for zso in adapter/out/oh-services/*.z.so; do\n  base=$(basename $zso)\n  echo \"Comparing $base vs baseline...\"\n  diff <(nm -D oh-baseline/$base | sort) <(nm -D $zso | sort) | grep '^>' | head\ndone"}
+  ],
+  parallel:{text:"GZ02 LLM-Judge 审查 AOSP/OH 补丁，同时 GZ05 继续编译缺失组件 (#14)。本地 PC 开发 Rendering Swarm (#17)。GZ03 行为对比 Window vs D600。", machines:["GZ02","GZ05","本地PC","GZ03"]},
+  refs:[
+    {label:"HanBing AOSP patches", path:"16.12-HanBing/AdapterCode/aosp_patches/"},
+    {label:"HanBing OH patches", path:"16.12-HanBing/AdapterCode/ohos_patches/"},
+    {label:"OH build patches", path:"16.12-HanBing/AdapterCode/build/oh_build_patches/"},
+    {label:"AI Pattern D05 LLM-as-Judge", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern D05)"}
+  ]
+},
+{
+  id:16, num:"#16", title:"Window/Surface Bridge (6 API)", phase:"Demo 1", phaseClass:"demo1", day:"D2-D3", steps:"81-100", duration:"4h",
+  machines:["GZ02","GZ05"],
+  input:[
+    "03-Window/api-spec.yaml",
+    "OH XComponent + OH_NativeWindow APIs",
+    "D600 Surface behavior baseline"
+  ],
+  output:[
+    "plugins/03-window/mock.c (in-memory Canvas)",
+    "plugins/03-window/bridge.cpp (XComponent + OH_NativeWindow)",
+    "6 API implementations: surfaceCreate/Destroy/Resize/GetCanvas/Flush + arkuiInit",
+    "Integration test: full rendering pipeline to PNG"
+  ],
+  verify:[
+    "6/6 API tests pass",
+    "Mock renders to in-memory buffer correctly",
+    "Bridge compiles with -lace_ndk -lnative_window",
+    "SSIM of rendered output vs baseline > 0.85"
+  ],
+  commands:[
+    {label:"Compile window bridge", cmd:"$OH_CLANG --target=aarch64-linux-ohos -shared -fPIC \\\n  -o plugins/03-window/bridge.so \\\n  plugins/03-window/bridge.cpp \\\n  -lace_ndk -lnative_window -lnative_drawing"},
+    {label:"Test rendering pipeline", cmd:"python3 tools/verify.py --plugin=03-window --check=render \\\n  --output=test-output/window-test.png"},
+    {label:"SSIM check", cmd:"python3 tools/verify.py --check=ssim \\\n  --actual=test-output/window-test.png \\\n  --expected=baselines/window-baseline.png \\\n  --threshold=0.85"}
+  ],
+  parallel:{text:"GZ02 编译 Window Bridge (1h)，同时 GZ05 编译缺失组件 (#14)。编译 1h 内本地 PC 3 路 Swarm 写 Rendering (#17)。GZ01 nm 验证 Activity 全符号。GZ03 SSIM 基线采集。", machines:["GZ02","GZ05","本地PC","GZ01","GZ03"]},
+  refs:[
+    {label:"Window api-spec", path:"16.11-Main/WestlakeV3/03-Window/api-spec.yaml"},
+    {label:"Boundary 3 (Window/Surface)", path:"16.21-Diff/15-boundaries.md (boundary 3)"},
+    {label:"OH NativeWindow API", path:"19.Document/19.1G.HarmonyOS-v7.0.0.18-D200/ (native_window)"},
+    {label:"H26 Anbox surface approach", path:"19.Document/19.4.Adapter-History/H26-Anbox/"}
+  ]
+},
+{
+  id:17, num:"#17", title:"Rendering Bridge (17 API) Swarm", phase:"Demo 1", phaseClass:"demo1", day:"D3", steps:"101-118", duration:"5h",
+  machines:["GZ02 x3 parallel","GZ05"],
+  input:[
+    "04-Rendering/api-spec.yaml",
+    "Window/Surface Bridge (from #16)",
+    "OH Drawing NDK APIs (OH_Drawing_*)",
+    "D600 rendering baselines"
+  ],
+  output:[
+    "Swarm Path A: Canvas 7 API (create/drawColor/drawRect/drawText/save/restore/translate)",
+    "Swarm Path B: Pen 3 + Brush 2 API (create/setColor/setWidth + create/setColor)",
+    "Swarm Path C: Font 3 + Bitmap 2 API (create/setSize/measureText + create/getPixels)",
+    "Combined render: background + rectangle + centered text = HelloWorld screen",
+    "PNG output with SSIM > 0.90 vs D600 baseline"
+  ],
+  verify:[
+    "17/17 API unit tests pass",
+    "Combined render produces correct HelloWorld image",
+    "SSIM > 0.90 vs D600 baseline",
+    "LLM-as-Judge: all 3 swarm paths APPROVE",
+    "nm bridge.so shows all 17 JNI symbols"
+  ],
+  commands:[
+    {label:"Launch 3-way swarm", cmd:"# Path A: Canvas (7 API)\nbash build/build.sh --target=rendering-canvas --ralph-loop &\n# Path B: Pen+Brush (5 API)\nbash build/build.sh --target=rendering-pen-brush --ralph-loop &\n# Path C: Font+Bitmap (5 API)\nbash build/build.sh --target=rendering-font-bitmap --ralph-loop &\nwait"},
+    {label:"Combined render test", cmd:"python3 tools/verify.py --plugin=04-rendering --check=combined-render \\\n  --output=test-output/helloworld-render.png"},
+    {label:"SSIM verification", cmd:"python3 tools/verify.py --check=ssim \\\n  --actual=test-output/helloworld-render.png \\\n  --expected=baselines/helloworld-d600.png \\\n  --threshold=0.90"}
+  ],
+  parallel:{text:"GZ02 x3 会话 Swarm 并行: Canvas 7API / Pen+Brush 5API / Font+Bitmap 5API。同时 GZ05 dalvikvm 全栈测试 + 编译 Rendering .so (1h)。编译等待 1h 内本地 PC 做组合渲染测试 + HelloWorld PNG。GZ01 符号全量验证。GZ03 SSIM 对比。", machines:["GZ02 (x3)","GZ05","本地PC","GZ01","GZ03"]},
+  refs:[
+    {label:"Boundary 4 (Rendering, 47 methods)", path:"16.21-Diff/15-boundaries.md (boundary 4)"},
+    {label:"Rendering api-spec", path:"16.11-Main/WestlakeV3/04-Rendering/api-spec.yaml"},
+    {label:"AI Pattern C03 Swarm parallel", path:"19.Document/19.3C.MultiAgent-Automation/ (pattern C03 Swarm)"},
+    {label:"PC-DEV-STRATEGY rendering section", path:"19.Document/19.4.Adapter-History/PC-DEV-STRATEGY.md (rendering)"},
+    {label:"OH Drawing NDK", path:"19.Document/19.1G.HarmonyOS-v7.0.0.18-D200/ (OH_Drawing_*)"},
+    {label:"H35 Wine GDI->DirectX rendering", path:"19.Document/19.4.Adapter-History/H35-Wine/ (rendering pipeline)"}
+  ]
+},
+{
+  id:18, num:"#18", title:"Full Stack Assembly + HelloWorld PASS", phase:"Demo 1", phaseClass:"demo1", day:"D3", steps:"119-130", duration:"4h",
+  machines:["GZ02"],
+  input:[
+    "All Bridge .so files (Logging + Activity + Window + Rendering)",
+    "All compile line artifacts (.so + .jar + patches + appspawn-x)",
+    "HelloWorld.dex",
+    "Mock environment"
+  ],
+  output:[
+    "Mock /system/android/ directory structure",
+    "Mock dalvikvm HelloWorld run log",
+    "HelloWorld rendered PNG",
+    "SSIM result vs D600 baseline (target > 0.85)",
+    "2476 regression test results (relevant subset)",
+    "Confidence evaluation (all > 0.85)",
+    "Demo 1 AI retrospective report",
+    "**Demo 1 HelloWorld: VIRTUAL PASS**"
+  ],
+  verify:[
+    "dalvikvm loads framework.jar successfully",
+    "HelloWorld.dex executes without crash",
+    "Rendered PNG shows 'Hello from Android on OH!'",
+    "SSIM > 0.85 vs D600 baseline",
+    "2476 regression: 0 new failures",
+    "Confidence gate: all metrics > 0.85"
+  ],
+  commands:[
+    {label:"Setup mock environment", cmd:"bash tools/setup-mock-system.sh\n# Creates /tmp/mock-system/android/ with all artifacts"},
+    {label:"Run HelloWorld", cmd:"dalvikvm -cp out/java/framework.jar:out/dex/HelloWorld.dex \\\n  -Djava.library.path=out/native:out/adapter \\\n  com.westlake.demo.HelloWorld"},
+    {label:"SSIM check", cmd:"python3 tools/verify.py --check=ssim \\\n  --actual=test-output/helloworld-final.png \\\n  --expected=baselines/helloworld-d600.png --threshold=0.85"},
+    {label:"Regression", cmd:"python3 tools/verify.py --check=regression --suite=2476 --subset=helloworld"},
+    {label:"Confidence gate", cmd:"python3 tools/confidence_gate.py --demo=1\n# Expected: DEMO_1_GATE: PASS"}
+  ],
+  parallel:{text:"GZ02 全栈组装 + dalvikvm 运行 HelloWorld，同时 GZ05 运行 2476 回归子集测试。本地 PC SSIM 对比 + Confidence 评估。编译等待时间预写 Input Bridge Mock (#19, D4 预备)。", machines:["GZ02","GZ05","本地PC"]},
+  refs:[
+    {label:"HelloWorld integration spec", path:"16.11-Main/WestlakeV3/90-Integration/"},
+    {label:"MASTER-PLAN integration steps", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 425-438)"},
+    {label:"Yue test framework (2476 tests)", path:"16.13-Yue/westlake/ (test infrastructure)"},
+    {label:"Experience criteria (7 dimensions)", path:"MEMORY: project_experience_criteria.md"}
+  ]
+},
+// ---- Demo 2: Calculator ----
+{
+  id:19, num:"#19", title:"Input Bridge (2 API)", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"131-140", duration:"3h",
+  machines:["GZ02","GZ05"],
+  input:[
+    "05-Input/api-spec.yaml",
+    "Window/Surface Bridge (from #16)",
+    "D600 touch/key event baselines",
+    "Calculator UI layout (21 buttons)"
+  ],
+  output:[
+    "plugins/05-input/mock.c (coordinate-based touch simulation)",
+    "plugins/05-input/bridge.cpp (OH input event -> Android MotionEvent/KeyEvent)",
+    "dispatchTouchEvent: 21-button hit-test verification",
+    "dispatchKeyEvent: basic key mapping"
+  ],
+  verify:[
+    "Touch at (x,y) correctly maps to button ID for all 21 buttons",
+    "Key events map correctly (BACK, HOME, etc.)",
+    "No event loss under rapid input (100 events/sec stress test)"
+  ],
+  commands:[
+    {label:"Compile input bridge", cmd:"$OH_CLANG --target=aarch64-linux-ohos -shared -fPIC \\\n  -o plugins/05-input/bridge.so \\\n  plugins/05-input/bridge.cpp \\\n  -lace_ndk"},
+    {label:"Button hit-test", cmd:"python3 tools/verify.py --plugin=05-input --check=hit-test \\\n  --buttons=21 --layout=calculator"}
+  ],
+  parallel:{text:"GZ02 编译 Input Bridge (30min)，同时 GZ05 编译 Extra Rendering (#20)。编译 30min 等待内本地 PC 写 Calculator 表达式解析器 (#21)。GZ01 nm 验证 Rendering 符号。GZ03 行为对比。", machines:["GZ02","GZ05","本地PC","GZ01","GZ03"]},
+  refs:[
+    {label:"Input api-spec", path:"16.11-Main/WestlakeV3/05-Input/api-spec.yaml"},
+    {label:"Boundary 5 (Input events)", path:"16.21-Diff/15-boundaries.md (boundary 5)"},
+    {label:"OH input event API", path:"19.Document/19.1G.HarmonyOS-v7.0.0.18-D200/ (input events)"}
+  ]
+},
+{
+  id:20, num:"#20", title:"Extra Rendering (5 API)", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"141-145", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "Rendering Bridge (from #17)",
+    "Calculator button design specs",
+    "D600 rendering baselines for circle/roundrect/line"
+  ],
+  output:[
+    "canvasDrawCircle, canvasDrawRoundRect, canvasDrawLine, canvasClipRect (4 API)",
+    "fontGetMetrics (1 API) for text centering",
+    "Calculator button rendering demo"
+  ],
+  verify:[
+    "5/5 API tests pass",
+    "Button rendering: rounded rectangles with centered text",
+    "fontGetMetrics returns correct ascent/descent for text centering"
+  ],
+  commands:[
+    {label:"Build extra rendering", cmd:"bash build/build.sh --target=rendering-extra --ralph-loop"},
+    {label:"Test button rendering", cmd:"python3 tools/verify.py --plugin=04-rendering --check=calculator-buttons"}
+  ],
+  parallel:{text:"GZ02 编译 Extra Rendering 5API，同时 GZ05 编译 Input Bridge (#19)。本地 PC 同步写 Calculator 21 按钮布局 (#21)。GZ03 SSIM 对比 Calculator 按钮渲染。", machines:["GZ02","GZ05","本地PC","GZ03"]},
+  refs:[
+    {label:"Rendering api-spec (extended)", path:"16.11-Main/WestlakeV3/04-Rendering/api-spec.yaml"},
+    {label:"Boundary 4 extended methods", path:"16.21-Diff/15-boundaries.md (boundary 4)"}
+  ]
+},
+{
+  id:21, num:"#21", title:"Calculator Logic", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"146-160", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "Input Bridge (from #19)",
+    "Extra Rendering (from #20)",
+    "Calculator UI layout (21 buttons: 0-9, +, -, x, /, =, C, ., +/-, %, (, ))"
+  ],
+  output:[
+    "Calculator.dex (complete calculator app)",
+    "21 button layout with touch targets",
+    "Expression parser (infix notation)",
+    "Arithmetic engine (handles: int, float, division-by-zero, overflow)"
+  ],
+  verify:[
+    "All 21 buttons rendered and touch-responsive",
+    "Expression parser handles: 1+2, 3*4+5, (1+2)*3",
+    "Arithmetic correct for basic operations",
+    "Division by zero shows 'Error' not crash"
+  ],
+  commands:[
+    {label:"Build calculator", cmd:"bash build/build.sh --target=calculator-dex"},
+    {label:"Run calculator", cmd:"dalvikvm -cp out/java/framework.jar:out/dex/Calculator.dex \\\n  -Djava.library.path=out/native:out/adapter \\\n  com.westlake.demo.Calculator --test-mode"}
+  ],
+  parallel:{text:"GZ02 组装 Calculator.dex，同时 GZ05 JVM 运行 Calculator 表达式测试。本地 PC 同步准备 41 用例测试矩阵 (#22)。GZ01 LLM-Judge 审查 Input 代码。", machines:["GZ02","GZ05","本地PC","GZ01"]},
+  refs:[
+    {label:"Calculator integration", path:"16.11-Main/WestlakeV3/90-Integration/"},
+    {label:"MASTER-PLAN Calculator section", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 442-465)"}
+  ]
+},
+{
+  id:22, num:"#22", title:"Calculator Test Matrix", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"161-175", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "Calculator.dex (from #21)",
+    "Full Bridge stack"
+  ],
+  output:[
+    "41 test cases executed:",
+    "  - 21 button tests (each button click verified)",
+    "  - 10 arithmetic tests (basic operations)",
+    "  - 5 edge cases (div-by-zero, overflow, empty, long-expression, rapid-click)",
+    "  - 5 sequence tests (multi-step calculations)",
+    "Test results report"
+  ],
+  verify:[
+    "41/41 tests pass",
+    "Each button press produces correct display update",
+    "Edge cases handled gracefully (no crash)",
+    "Sequence: 1+2=3, C, 4*5=20 works correctly"
+  ],
+  commands:[
+    {label:"Run test matrix", cmd:"python3 tools/verify.py --plugin=calculator --check=test-matrix \\\n  --cases=41 --report=reports/calculator-test-matrix.html"},
+    {label:"Edge case tests", cmd:"python3 tools/verify.py --plugin=calculator --check=edge-cases \\\n  --cases=div-by-zero,overflow,empty,long-expr,rapid-click"}
+  ],
+  parallel:{text:"GZ02 运行 41 用例测试矩阵，同时 GZ05 回归 Demo1 子集测试。本地 PC 准备截图 + AI Vision 验证 (#23)。GZ03 SSIM 对比 Calculator vs D600。", machines:["GZ02","GZ05","本地PC","GZ03"]},
+  refs:[
+    {label:"Test matrix design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 461-462)"},
+    {label:"Experience criteria (23 acceptance)", path:"MEMORY: project_experience_criteria.md"}
+  ]
+},
+{
+  id:23, num:"#23", title:"Calculator Visual Verification", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"176-185", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "Calculator running in mock environment",
+    "D600 calculator screenshots as baseline"
+  ],
+  output:[
+    "Screenshots per button click (21 images)",
+    "AI Vision analysis for each screenshot",
+    "SSIM scores per screenshot vs D600 baseline",
+    "Visual verification report"
+  ],
+  verify:[
+    "AI Vision confirms: correct numbers displayed after each click",
+    "SSIM > 0.85 for calculator display area",
+    "Button highlight/press feedback visible",
+    "No rendering artifacts"
+  ],
+  commands:[
+    {label:"Generate screenshots", cmd:"python3 tools/verify.py --plugin=calculator --check=visual \\\n  --screenshot-per-click --output=test-output/calculator-clicks/"},
+    {label:"AI Vision analysis", cmd:"python3 tools/ai-vision.py --dir=test-output/calculator-clicks/ \\\n  --criteria='correct number displayed, no artifacts'"},
+    {label:"SSIM batch", cmd:"python3 tools/verify.py --check=ssim-batch \\\n  --actual-dir=test-output/calculator-clicks/ \\\n  --expected-dir=baselines/calculator-d600/ --threshold=0.85"}
+  ],
+  parallel:{text:"GZ02 AI Vision 验证截图，同时 GZ05 SSIM 批量对比。本地 PC 开始预写 MockDonalds 5 页面结构 (#26, D5 预备)。GZ03 行为对比 Input 事件。", machines:["GZ02","GZ05","本地PC","GZ03"]},
+  refs:[
+    {label:"AI Vision verification", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 462)"},
+    {label:"SSIM threshold design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 122)"},
+    {label:"Simulator watermark requirement", path:"MEMORY: feedback_simulator_watermark.md"}
+  ]
+},
+{
+  id:24, num:"#24", title:"Calculator Integration + PASS", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"186-190", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "All Calculator test results",
+    "Visual verification",
+    "Demo 1 regression"
+  ],
+  output:[
+    "Confidence evaluation (all > 0.85)",
+    "AI retrospective: Demo 2 vs Demo 1 speed comparison",
+    "**Demo 2 Calculator: VIRTUAL PASS**"
+  ],
+  verify:[
+    "41/41 test matrix pass",
+    "SSIM > 0.85 on all screenshots",
+    "Demo 1 regression: 0 new failures",
+    "Confidence gate: PASS"
+  ],
+  commands:[
+    {label:"Confidence gate", cmd:"python3 tools/confidence_gate.py --demo=2\n# Expected: DEMO_2_GATE: PASS"},
+    {label:"AI retrospective", cmd:"python3 tools/ai-retrospective.py --phase=calculator \\\n  --compare-to=demo1 --metrics=speed,quality,ralph-loop-usage"}
+  ],
+  parallel:{text:"GZ02 Confidence Gate 检查，同时 GZ05 预编译 Preferences Mock (#28, D5 预备)。本地 PC 预写 MockDonalds APK (#26)。HK01 完善 auto-fix.yml (#27)。", machines:["GZ02","GZ05","本地PC","HK01"]},
+  refs:[
+    {label:"Demo 2 acceptance", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 463-465)"}
+  ]
+},
+{
+  id:25, num:"#25", title:"Self-Healing Buffer", phase:"Demo 2", phaseClass:"demo2", day:"D4", steps:"191-220", duration:"4h",
+  machines:["GZ02","GZ05"],
+  input:[
+    "Any failures from Demo 1 or Demo 2",
+    "Ralph Loop engine",
+    "AI autonomous fixing capability"
+  ],
+  output:[
+    "30 steps reserved for AI autonomous problem solving:",
+    "  - Compile errors -> Ralph Loop auto-fix",
+    "  - Behavior differences -> analyze + fix",
+    "  - Rendering inconsistencies -> adjust",
+    "  - Any new issues -> AI self-resolves",
+    "Self-healing log with resolution details"
+  ],
+  verify:[
+    "All previously-failing tests now pass",
+    "No human intervention required",
+    "Self-healing log documents each fix"
+  ],
+  commands:[
+    {label:"Run self-healing loop", cmd:"bash tools/ralph-loop.sh --mode=autonomous --max-steps=30 \\\n  --targets=all-failing-tests \\\n  --log=reports/self-healing-buffer.log"}
+  ],
+  parallel:{text:"GZ02 + GZ05 AI 自主修复所有 Demo1/Demo2 问题（Ralph Loop），同时本地 PC 预写 MockDonalds (#26) + Preferences Mock (#28)。HK01 测试 GitHub Actions (#27)。", machines:["GZ02","GZ05","本地PC","HK01"]},
+  refs:[
+    {label:"Self-healing design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 467-476)"},
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"},
+    {label:"AI Pattern 02-10 Self-Heal", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern 02-10)"}
+  ]
+},
+// ---- Demo 3: Self-Healing ----
+{
+  id:26, num:"#26", title:"MockDonalds APK Build", phase:"Demo 3", phaseClass:"demo3", day:"D5", steps:"221-225", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "Android SDK",
+    "SharedPreferences API spec",
+    "5-page app design: Home/Menu/Detail/Cart/Confirm"
+  ],
+  output:[
+    "MockDonalds.apk (5 pages)",
+    "Uses SharedPreferences for cart state",
+    "Bug reproduction: add items -> restart -> cart empty",
+    "Screenshots: 'cart has 3 burgers' -> restart -> 'cart empty'"
+  ],
+  verify:[
+    "APK installs in mock environment",
+    "5 pages navigable: Home->Menu->Detail->Cart->Confirm",
+    "SharedPreferences.apply() called on cart modification",
+    "Bug confirmed: restart clears cart (Mock has no persistence)"
+  ],
+  commands:[
+    {label:"Build MockDonalds", cmd:"bash build/build.sh --target=mockdonalds-dex"},
+    {label:"Reproduce bug", cmd:"dalvikvm -cp out/dex/MockDonalds.dex \\\n  com.westlake.demo.MockDonalds --scenario=cart-persistence-bug\n# Expected: FAIL - cart data lost after restart"}
+  ],
+  parallel:{text:"GZ02 构建 MockDonalds.dex 5 页面，同时 HK01 搭建 GitHub Actions auto-fix (#27)。GZ05 JVM 验证购物车逻辑。本地 PC 写 Preferences 行为测试 (#28) + SharedPrefs Bug 脚本。", machines:["GZ02","HK01","GZ05","本地PC"]},
+  refs:[
+    {label:"Demo 3 scenario design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 486-530)"},
+    {label:"H06 Mono behavior consistency", path:"19.Document/19.4.Adapter-History/ (H06 pattern)"},
+    {label:"Preferences api-spec", path:"16.11-Main/WestlakeV3/06-Preferences/api-spec.yaml"}
+  ]
+},
+{
+  id:27, num:"#27", title:"GitHub Actions Setup", phase:"Demo 3", phaseClass:"demo3", day:"D5", steps:"226-230", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "GitHub repo (from #5)",
+    "Claude Code Action",
+    "CI/CD workflow templates"
+  ],
+  output:[
+    ".github/workflows/auto-fix.yml (Issue -> AI analyze -> fix -> PR)",
+    ".github/workflows/ci.yml (PR -> compile + mock-test + SSIM)",
+    "Claude Code Action permissions configured",
+    "Issue template: API incompatibility report format",
+    "Local test: manual Issue -> workflow triggers"
+  ],
+  verify:[
+    "Create test Issue -> auto-fix.yml triggers within 1 minute",
+    "Create test PR -> ci.yml triggers and runs tests",
+    "Claude Code Action has repo read/write permissions"
+  ],
+  commands:[
+    {label:"Verify workflow", cmd:"gh workflow list\ngh issue create --title 'Test: auto-fix trigger' --body 'Test issue'\ngh run list --workflow=auto-fix.yml --limit 1"}
+  ],
+  parallel:{text:"HK01 搭建 GitHub Actions + Claude Code Action，同时 GZ02 构建 MockDonalds (#26)。GZ05 JVM 测试 Preferences。本地 PC 编写 Issue 模板 + Bug 脚本。", machines:["HK01","GZ02","GZ05","本地PC"]},
+  refs:[
+    {label:"Claude Code Action", path:"github.com/anthropics/claude-code-action"},
+    {label:"AI Pattern C08 CI Self-Heal", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern C08)"},
+    {label:"H63 AWS Q auto-remediation", path:"19.Document/19.4.Adapter-History/ (H63)"},
+    {label:"auto-fix.yml template", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 743-761)"},
+    {label:"25 CI repos reference", path:"MEMORY: reference_claude_code_ci_repos.md"}
+  ]
+},
+{
+  id:28, num:"#28", title:"Preferences Test Infrastructure", phase:"Demo 3", phaseClass:"demo3", day:"D5", steps:"231-235", duration:"2h",
+  machines:["GZ02"],
+  input:[
+    "SharedPreferences API spec (15 methods)",
+    "MockDonalds.apk",
+    "CI matrix configuration"
+  ],
+  output:[
+    "Preferences behavior tests (apply -> restart -> data persists?)",
+    "CI test matrix entry for Preferences",
+    "App-layer Mock: ConcurrentHashMap + file serialization skeleton",
+    "System-layer Bridge skeleton: OH_Preferences_* API stubs"
+  ],
+  verify:[
+    "Behavior test correctly detects: Mock = FAIL (no persistence)",
+    "CI matrix includes Preferences test",
+    "App-layer mock compiles but fails persistence test (as expected)",
+    "System-layer skeleton compiles with stub implementations"
+  ],
+  commands:[
+    {label:"Run persistence test", cmd:"python3 tools/verify.py --plugin=06-preferences --check=persistence \\\n  --scenario=write-restart-read\n# Expected: FAIL (confirms bug exists)"}
+  ],
+  parallel:{text:"GZ02 编写 Preferences 测试基础设施，同时 GZ05 Docker 预编译系统层 Preferences Bridge (#32, 1h)。编译等待 1h 内本地 PC 准备 Demo 演示脚本 (#29)。D200 连接准备。", machines:["GZ02","GZ05","本地PC","D200"]},
+  refs:[
+    {label:"Preferences api-spec", path:"16.11-Main/WestlakeV3/06-Preferences/api-spec.yaml"},
+    {label:"Boundary 7 (Preferences, 15 methods)", path:"16.21-Diff/15-boundaries.md (boundary 7)"},
+    {label:"H06 Mono behavior consistency", path:"19.Document/19.4.Adapter-History/ (H06)"}
+  ]
+},
+{
+  id:29, num:"#29", title:"Live Demo: Bug Discovery", phase:"Demo 3", phaseClass:"demo3", day:"D5", steps:"236-237", duration:"0.5h",
+  machines:["D200 (real device)"],
+  input:[
+    "MockDonalds deployed on D200",
+    "GitHub Issue template"
+  ],
+  output:[
+    "Screenshot evidence: 'cart has 3 burgers' -> restart -> 'cart empty'",
+    "GitHub Issue #1: 'Bug: SharedPreferences data lost after restart'",
+    "Issue includes: reproduction steps, expected behavior, API, screenshots"
+  ],
+  verify:[
+    "Bug visually confirmed on D200",
+    "Issue created on GitHub with correct format",
+    "auto-fix.yml workflow triggered"
+  ],
+  commands:[
+    {label:"Submit Issue", cmd:"gh issue create \\\n  --title 'Bug: SharedPreferences data lost after restart' \\\n  --body \"$(cat <<'ISSUE'\n## Reproduction Steps\n1. MockDonalds: add 3 burgers to cart\n2. Close APP\n3. Reopen -> cart is empty\n\n## Expected Behavior\nCart data should persist after APP restart\n\n## API\nSharedPreferences.apply() / SharedPreferences.getString()\n\n## Screenshots\n[cart-with-data.png] -> [cart-empty.png]\nISSUE\n)\""}
+  ],
+  parallel:{text:"D200 真机演示发现 Bug，同时 GZ05 Docker 编译系统层 Preferences (#32)。GZ02 准备接收 auto-fix workflow。本地 PC 操控设备 + 提交 Issue。", machines:["D200","GZ05","GZ02","本地PC"]},
+  refs:[
+    {label:"Demo 3 live script", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 524-548)"},
+    {label:"Issue template", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 532-548)"}
+  ]
+},
+{
+  id:30, num:"#30", title:"Live Demo: AI Auto-Fix", phase:"Demo 3", phaseClass:"demo3", day:"D5", steps:"238-243", duration:"0.5h",
+  machines:["GitHub Actions"],
+  input:[
+    "GitHub Issue #1",
+    "auto-fix.yml workflow",
+    "Claude Code Action",
+    "Preferences Mock code"
+  ],
+  output:[
+    "AI Bot comment: 'Located problem. Preferences.apply() Mock lacks file persistence. Starting fix.'",
+    "Fix: ConcurrentHashMap -> JSON -> file write -> read back on restart",
+    "Auto-generated test: write -> 'restart' (clear memory) -> read -> verify",
+    "Ralph Loop: compile + test PASS",
+    "Auto PR -> CI passes -> merged"
+  ],
+  verify:[
+    "AI correctly identifies: Preferences Mock missing persistence",
+    "Fix adds file serialization (JSON)",
+    "Auto-generated test passes",
+    "PR CI pipeline: all green",
+    "Total time: Issue to merged PR < 15 minutes"
+  ],
+  commands:[
+    {label:"Watch AI progress", cmd:"# Watch the auto-fix workflow\ngh run watch $(gh run list --workflow=auto-fix.yml --limit 1 --json databaseId -q '.[0].databaseId')"},
+    {label:"Check PR", cmd:"gh pr list --state open --label auto-fix\ngh pr view --web"}
+  ],
+  parallel:{text:"GitHub Actions AI 自动修复 (Claude Code Action)，同时 GZ05 继续编译系统层 Preferences (#32)。GZ02 准备 Ralph Loop 编译环境。本地 PC 监控 + 准备 hotfix 部署脚本。", machines:["GitHub Actions","GZ05","GZ02","本地PC"]},
+  refs:[
+    {label:"AI Pattern 02-10 Self-Heal", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern 02-10)"},
+    {label:"AI Pattern C08 CI Self-Heal", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern C08)"},
+    {label:"Claude Code Action", path:"github.com/anthropics/claude-code-action"},
+    {label:"H63 AWS Q auto-remediation", path:"19.Document/19.4.Adapter-History/ (H63)"},
+    {label:"auto-fix.yml workflow", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 743-761)"},
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"}
+  ]
+},
+{
+  id:31, num:"#31", title:"Live Demo: Hotfix Release", phase:"Demo 3", phaseClass:"demo3", day:"D5", steps:"244-248", duration:"1h",
+  machines:["D200 (real device)","GitHub"],
+  input:[
+    "Merged PR with Preferences fix",
+    "release.yml workflow",
+    "D200 device"
+  ],
+  output:[
+    "Tag: v0.3.1-hotfix",
+    "Release: liboh_adapter_bridge_preferences_hotfix.so",
+    "hdc push to D200",
+    "Verification: cart data persists after restart",
+    "AI Issue comment: 'App-layer hotfix released. System-layer fix in 2 weeks.'",
+    "Timeline record: Issue to hotfix = 15 minutes"
+  ],
+  verify:[
+    "v0.3.1-hotfix tag created",
+    "Release artifact downloadable",
+    "D200: MockDonalds cart data persists after restart",
+    "Screenshot evidence: cart still has 3 burgers after restart"
+  ],
+  commands:[
+    {label:"Deploy hotfix", cmd:"# Download release artifact\ngh release download v0.3.1-hotfix -p '*.so' -D /tmp/hotfix/\n# Push to device\nhdc file send /tmp/hotfix/liboh_adapter_bridge_preferences_hotfix.so \\\n  /system/android/lib64/"},
+    {label:"Verify on device", cmd:"hdc shell am start com.westlake.demo.MockDonalds\n# Add items to cart -> close -> reopen\n# Verify: cart data still there"}
+  ],
+  parallel:{text:"D200 验证 hotfix + GitHub Release，同时 GZ05 继续编译系统层 Preferences (#32)。GZ02 全量编译准备 (#34)。本地 PC hdc push hotfix .so 到 D200。", machines:["D200","GitHub","GZ05","GZ02","本地PC"]},
+  refs:[
+    {label:"Hotfix flow", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 566-578)"},
+    {label:"release.yml design", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 259)"}
+  ]
+},
+{
+  id:32, num:"#32", title:"System-Layer Preferences Bridge (15 API)", phase:"Demo 3", phaseClass:"demo3", day:"D5-D6", steps:"256-265", duration:"6h",
+  machines:["GZ02","GZ05 Docker"],
+  input:[
+    "OH API docs: OH_Preferences_Open/Get/Put/Flush",
+    "string_bridge.so (RAII pattern)",
+    "D600 SharedPreferences behavior baseline",
+    "D200 OH_Preferences behavior baseline"
+  ],
+  output:[
+    "plugins/06-preferences/bridge.cpp (JNI -> OH_Preferences_*)",
+    "Real filesystem persistence (not just memory)",
+    "15 API x 3 test cases = 45 unit tests",
+    "Async wrapper: Android apply() async vs OH flush() sync",
+    "API behavior comparison: D600 vs Bridge vs D200",
+    "LLM-as-Judge review: APPROVE",
+    "Integrated into main liboh_adapter_bridge.so"
+  ],
+  verify:[
+    "45/45 unit tests pass",
+    "Persistence test: write -> process restart -> read back = SUCCESS",
+    "apply() is async (returns immediately, writes in background)",
+    "Behavior matches D600 baseline",
+    "nm bridge.so shows all 15 Preferences JNI symbols",
+    "LLM-as-Judge: APPROVE"
+  ],
+  commands:[
+    {label:"Compile Preferences bridge", cmd:"$OH_CLANG --target=aarch64-linux-ohos -shared -fPIC \\\n  -o plugins/06-preferences/bridge.so \\\n  plugins/06-preferences/bridge.cpp \\\n  -I 00-Infrastructure/string_bridge/ \\\n  -lohospreferences -lpthread"},
+    {label:"Run 45 tests", cmd:"python3 tools/verify.py --plugin=06-preferences --check=all \\\n  --cases=45 --report=reports/preferences-test.html"},
+    {label:"Behavior comparison", cmd:"python3 tools/verify.py --plugin=06-preferences --check=behavior \\\n  --baseline-d600=api-behaviors/d600-preferences.json \\\n  --baseline-d200=api-behaviors/d200-preferences.json"}
+  ],
+  parallel:{text:"GZ02 开发系统层 Preferences Bridge 15API，GZ05 Docker 交叉编译 (1h)。编译 1h 内本地 PC 写异步 apply() 包装器 + 45 单元测试。GZ01 监控编译状态。GZ03 行为对比 D600 vs D200。", machines:["GZ02","GZ05","本地PC","GZ01","GZ03"]},
+  refs:[
+    {label:"Boundary 7 (Preferences, 15 methods)", path:"16.21-Diff/15-boundaries.md (boundary 7)"},
+    {label:"Wine insights (behavior consistency)", path:"16.11-Main/WestlakeV3/00-Infrastructure/WINE-INSIGHTS.md"},
+    {label:"H06 Mono behavior consistency", path:"19.Document/19.4.Adapter-History/ (H06)"},
+    {label:"STRING_BRIDGE_USAGE (RAII)", path:"16.11-Main/WestlakeV3/00-Infrastructure/string_bridge/string_bridge.h"},
+    {label:"OH Preferences NDK API", path:"19.Document/19.1G.HarmonyOS-v7.0.0.18-D200/ (OH_Preferences_*)"},
+    {label:"Preferences api-spec", path:"16.11-Main/WestlakeV3/06-Preferences/api-spec.yaml"},
+    {label:"H35 Wine registry persistence", path:"19.Document/19.4.Adapter-History/H35-Wine/ (registry)"}
+  ]
+},
+{
+  id:33, num:"#33", title:"Full Regression", phase:"Demo 3", phaseClass:"demo3", day:"D6", steps:"266-272", duration:"3h",
+  machines:["GZ02"],
+  input:[
+    "All 3 demos (HelloWorld + Calculator + MockDonalds)",
+    "2476 existing tests",
+    "All SSIM baselines"
+  ],
+  output:[
+    "Demo 1 HelloWorld regression: PASS",
+    "Demo 2 Calculator regression: PASS",
+    "Demo 3 MockDonalds full flow (including cart persistence): PASS",
+    "2476 test regression results",
+    "Full SSIM comparison",
+    "Confidence: all > 0.85",
+    "Gate: PASS"
+  ],
+  verify:[
+    "3/3 Demos pass",
+    "2476 tests: 0 new failures",
+    "All SSIM scores > 0.85",
+    "Confidence gate: PASS"
+  ],
+  commands:[
+    {label:"Full regression", cmd:"python3 tools/verify.py --check=full-regression \\\n  --demos=1,2,3 --tests=2476 --ssim --confidence"},
+    {label:"Gate check", cmd:"python3 tools/confidence_gate.py --phase=demo3-regression\n# Expected: REGRESSION_GATE: PASS"}
+  ],
+  parallel:{text:"GZ02 全量回归 3 Demo + 2476 测试，同时 GZ05 SSIM 全量对比。本地 PC Confidence 评估 + 修复任何差异。GZ01 SSIM 全量。GZ03 行为对比全量。", machines:["GZ02","GZ05","本地PC","GZ01","GZ03"]},
+  refs:[
+    {label:"Regression spec", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 600-607)"},
+    {label:"Yue test suite (2476)", path:"16.13-Yue/westlake/"}
+  ]
+},
+{
+  id:34, num:"#34", title:"ROM Release v0.4.0", phase:"Demo 3", phaseClass:"demo3", day:"D6", steps:"273-278", duration:"3h",
+  machines:["GZ05 Docker","GitHub"],
+  input:[
+    "All Bridge .so files (including system-layer Preferences)",
+    "Updated OH patches (if needed)",
+    "All test results PASS"
+  ],
+  output:[
+    "liboh_adapter_bridge.so (full version with Preferences system-layer)",
+    "framework.jar (updated)",
+    "deploy.sh (one-click deployment)",
+    "CHANGELOG.md (auto-generated)",
+    "Tag: v0.4.0",
+    "GitHub Release with all artifacts",
+    "Issue #1 auto-closed with comment"
+  ],
+  verify:[
+    "v0.4.0 tag created",
+    "Release has all 4 artifacts (.so, .jar, deploy.sh, CHANGELOG)",
+    "Issue #1 closed with system-layer fix note",
+    "readelf on release .so confirms AArch64"
+  ],
+  commands:[
+    {label:"Docker full compile", cmd:"docker exec gz05-oh-builder bash -c '\n  bash build/build.sh --target=all --arch=aarch64 --release\n'"},
+    {label:"Create release", cmd:"gh release create v0.4.0 \\\n  out/liboh_adapter_bridge.so \\\n  out/framework.jar \\\n  tools/deploy.sh \\\n  --title 'v0.4.0 - System-layer Preferences Bridge' \\\n  --notes-file CHANGELOG.md"},
+    {label:"Close Issue", cmd:"gh issue close 1 --comment 'System-layer fix released in v0.4.0. SharedPreferences fully compatible.'"}
+  ],
+  parallel:{text:"GZ05 Docker 全量编译 Release (1h)，GitHub 发布 v0.4.0。编译 1h 内本地 PC 写 CHANGELOG + 领导材料 (#35)。GZ02 预编译 D7 部署包。HK01 Issue 自动关闭。", machines:["GZ05","GitHub","本地PC","GZ02","HK01"]},
+  refs:[
+    {label:"Release flow", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 608-627)"},
+    {label:"Version strategy", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 763-771)"}
+  ]
+},
+{
+  id:35, num:"#35", title:"Demo 3 Summary + Leadership Materials", phase:"Demo 3", phaseClass:"demo3", day:"D6", steps:"279-280", duration:"1h",
+  machines:["Local"],
+  input:[
+    "All demo results",
+    "Timeline data",
+    "Comparison metrics"
+  ],
+  output:[
+    "Demo 3 timeline: Issue(0min) -> AI locate(3min) -> Hotfix(15min) -> System ROM(2wk)",
+    "Comparison chart: Traditional vs WestlakeV3",
+    "Leadership presentation deck",
+    "**Demo 3 Self-Healing: PASS**"
+  ],
+  verify:[
+    "Timeline accurate and documented",
+    "Comparison chart shows clear advantages",
+    "Presentation covers all 3 demos"
+  ],
+  commands:[
+    {label:"Generate summary", cmd:"python3 tools/generate-summary.py --demos=1,2,3 \\\n  --output=reports/demo3-summary.html"}
+  ],
+  parallel:{text:"本地 PC 生成汇总报告 + 领导演示材料，同时 GZ02 预编译 D7 部署包，GZ05 准备全部产物到 NFS。", machines:["本地PC","GZ02","GZ05"]},
+  refs:[
+    {label:"Leadership comparison table", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 136-143)"},
+    {label:"Leadership briefing notes", path:"MEMORY: project_leadership_notes.md"}
+  ]
+},
+// ---- Device Verification (D7) ----
+{
+  id:36, num:"#36", title:"Push Layer 1-4 to D200", phase:"Device", phaseClass:"device", day:"D7", steps:"281-287", duration:"2h",
+  machines:["D200 (real device)"],
+  input:[
+    "All .so files from adapter/out/native/",
+    "liboh_adapter_bridge.so from adapter/out/adapter/",
+    "framework.jar from adapter/out/java/",
+    "4 OH patched .z.so from adapter/out/oh-services/",
+    "appspawn-x + appspawn_x.cfg"
+  ],
+  output:[
+    "D200 /system/android/ populated with all artifacts",
+    "D200 /system/lib64/platformsdk/ updated with patched .z.so",
+    "D200 appspawn-x installed and configured",
+    "Device rebooted (ROM #1)"
+  ],
+  verify:[
+    "hdc file send: all files transferred successfully",
+    "ls -la on device shows all files with correct sizes",
+    "Device boots successfully after reboot"
+  ],
+  commands:[
+    {label:"Push all artifacts", cmd:"# Layer 1: bionic + Layer2\nhdc file send out/native/libbionic_compat.so /system/android/lib64/\nfor so in out/native/layer2_*.so; do\n  hdc file send $so /system/android/lib64/\ndone\n\n# Layer 2: ART + runtime\nhdc file send out/native/libart.so /system/android/lib64/\nhdc file send out/java/framework.jar /system/android/framework/\n\n# Layer 3: Bridge\nhdc file send out/adapter/liboh_adapter_bridge.so /system/android/lib64/\n\n# Layer 4: OH patches\nfor zso in out/oh-services/*.z.so; do\n  hdc file send $zso /system/lib64/platformsdk/\ndone\n\n# appspawn-x\nhdc file send out/adapter/appspawn-x /system/bin/\nhdc file send out/adapter/appspawn_x.cfg /system/etc/"},
+    {label:"Reboot", cmd:"hdc shell reboot\n# Wait for device...\nhdc wait-for-device\nhdc list targets"}
+  ],
+  parallel:{text:"本地 PC 通过 hdc 推送全部产物到 D200，同时 D600 采集 SSIM 基线截图 (#42)。GZ02 待命如需紧急重编。GZ05 待命测试。", machines:["D200","D600","本地PC","GZ02","GZ05"]},
+  refs:[
+    {label:"Deploy script", path:"16.12-HanBing/AdapterCode/build/deploy.sh"},
+    {label:"Device verification plan", path:"16.11-Main/WestlakeV3/91-DeviceVerify/"},
+    {label:"D200 specs", path:"MEMORY: project_dayu200_devkit.md"}
+  ]
+},
+{
+  id:37, num:"#37", title:"Reboot + Health Check", phase:"Device", phaseClass:"device", day:"D7", steps:"288-293", duration:"1.5h",
+  machines:["D200"],
+  input:[
+    "D200 after ROM #1 reboot"
+  ],
+  output:[
+    "Health check results: ps / aa / bm / hidumper",
+    "appspawn-x process running",
+    "OH system services healthy",
+    "No crash logs in hilog"
+  ],
+  verify:[
+    "ps -ef | grep appspawn-x shows process",
+    "aa dump -a shows AbilityManager healthy",
+    "bm dump -a shows BundleManager healthy",
+    "hidumper shows no ANR/crash",
+    "hilog | grep FATAL returns empty"
+  ],
+  commands:[
+    {label:"Health check", cmd:"hdc shell ps -ef | grep -E 'appspawn|android'\nhdc shell aa dump -a 2>/dev/null | head -20\nhdc shell bm dump -a 2>/dev/null | head -20\nhdc shell hidumper --mem | head -10\nhdc shell hilog -T Adapter | tail -50"}
+  ],
+  parallel:{text:"D200 健康检查，同时 D600 运行 3 Demo 采集 SSIM 基线。本地 PC 同步准备安装 3 Demo (#38-#40)。如有异常 GZ02 立即开始编译修复。", machines:["D200","D600","本地PC","GZ02"]},
+  refs:[
+    {label:"Health check criteria", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 647-650)"},
+    {label:"D200 OH V7.0 environment", path:"MEMORY: project_dayu200_devkit.md"}
+  ]
+},
+{
+  id:38, num:"#38", title:"HelloWorld on Device", phase:"Device", phaseClass:"device", day:"D7", steps:"294-297", duration:"2h",
+  machines:["D200"],
+  input:[
+    "HelloWorld.dex",
+    "Healthy D200 (from #37)",
+    "D600 baseline screenshots"
+  ],
+  output:[
+    "HelloWorld installed on D200",
+    "AI screenshot of running app",
+    "SSIM comparison: D200 render vs D600 baseline",
+    "**HelloWorld on real device: confirmed**"
+  ],
+  verify:[
+    "HelloWorld launches without crash",
+    "Screen shows 'Hello from Android on OH!'",
+    "SSIM D200 vs D600 > 0.80",
+    "AI Vision confirms correct rendering"
+  ],
+  commands:[
+    {label:"Install and run", cmd:"hdc install out/dex/HelloWorld.dex\nhdc shell am start com.westlake.demo.HelloWorld"},
+    {label:"Screenshot + SSIM", cmd:"hdc shell snapshot_display > /tmp/d200-helloworld.png\npython3 tools/verify.py --check=ssim \\\n  --actual=/tmp/d200-helloworld.png \\\n  --expected=baselines/helloworld-d600.png --threshold=0.80"}
+  ],
+  parallel:{text:"D200 运行 HelloWorld + 截图，同时 D600 运行 HelloWorld 采集对比基线。本地 PC AI Vision 验证 + SSIM 对比。如失败 GZ02 立即 Ralph Loop 修复 + 重编。", machines:["D200","D600","本地PC","GZ02"]},
+  refs:[
+    {label:"Device verify plan", path:"16.11-Main/WestlakeV3/91-DeviceVerify/"},
+    {label:"SSIM threshold for device", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 434)"}
+  ]
+},
+{
+  id:39, num:"#39", title:"Calculator on Device", phase:"Device", phaseClass:"device", day:"D7", steps:"298-300", duration:"1.5h",
+  machines:["D200"],
+  input:[
+    "Calculator.dex",
+    "D200 with HelloWorld passed"
+  ],
+  output:[
+    "Calculator installed on D200",
+    "AI screenshot: 1+2=3 displayed",
+    "Touch responsiveness verified"
+  ],
+  verify:[
+    "Calculator launches",
+    "Tap '1', '+', '2', '=' shows '3'",
+    "AI screenshot confirms correct display",
+    "All 21 buttons responsive"
+  ],
+  commands:[
+    {label:"Install and test", cmd:"hdc install out/dex/Calculator.dex\nhdc shell am start com.westlake.demo.Calculator\n# Simulate: 1 + 2 =\nhdc shell input tap 100 400  # '1'\nhdc shell input tap 300 200  # '+'\nhdc shell input tap 200 400  # '2'\nhdc shell input tap 300 500  # '='"},
+    {label:"Screenshot", cmd:"hdc shell snapshot_display > /tmp/d200-calculator.png\npython3 tools/ai-vision.py --image=/tmp/d200-calculator.png \\\n  --criteria='display shows 3, buttons visible'"}
+  ],
+  parallel:{text:"D200 运行 Calculator + 触摸测试，同时 D600 运行 Calculator 采集对比基线。本地 PC AI Vision 验证按钮 + SSIM。GZ02 待命如需修复编译。", machines:["D200","D600","本地PC","GZ02"]},
+  refs:[
+    {label:"Calculator verification", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 653)"}
+  ]
+},
+{
+  id:40, num:"#40", title:"MockDonalds on Device", phase:"Device", phaseClass:"device", day:"D7", steps:"301-305", duration:"2h",
+  machines:["D200"],
+  input:[
+    "MockDonalds.dex (with Preferences fix)",
+    "D200 with Calculator passed"
+  ],
+  output:[
+    "MockDonalds installed on D200",
+    "5 pages navigated: Home->Menu->Detail->Cart->Confirm",
+    "Cart persistence verified (add items -> restart -> items still there)",
+    "AI screenshots for each page"
+  ],
+  verify:[
+    "All 5 pages render correctly",
+    "Navigation between pages works",
+    "Add 3 items to cart -> restart app -> cart still has 3 items",
+    "AI Vision confirms: each page content correct"
+  ],
+  commands:[
+    {label:"Install and navigate", cmd:"hdc install out/dex/MockDonalds.dex\nhdc shell am start com.westlake.demo.MockDonalds\n# Navigate through 5 pages and take screenshots\nfor page in home menu detail cart confirm; do\n  hdc shell snapshot_display > /tmp/d200-mcdonalds-$page.png\n  # Navigate to next page\ndone"},
+    {label:"Persistence test", cmd:"# Add items to cart\nhdc shell am force-stop com.westlake.demo.MockDonalds\nhdc shell am start com.westlake.demo.MockDonalds\nhdc shell snapshot_display > /tmp/d200-mcdonalds-cart-after-restart.png\npython3 tools/ai-vision.py --image=/tmp/d200-mcdonalds-cart-after-restart.png \\\n  --criteria='cart shows items, not empty'"}
+  ],
+  parallel:{text:"D200 运行 MockDonalds 5 页面 + 持久化测试，同时 D600 运行 MockDonalds 对比。本地 PC AI Vision 验证每页 + 购物车持久化。GZ02/GZ05 待命修复。", machines:["D200","D600","本地PC","GZ02","GZ05"]},
+  refs:[
+    {label:"MockDonalds verification", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (line 654)"},
+    {label:"Demo 3 scenario", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 486-530)"}
+  ]
+},
+{
+  id:41, num:"#41", title:"Device Issue Fix", phase:"Device", phaseClass:"device", day:"D7", steps:"306-311", duration:"3h",
+  machines:["D200","GZ02","GZ05"],
+  input:[
+    "Any device issues from #38-#40",
+    "Ralph Loop engine",
+    "Remote fix capability"
+  ],
+  output:[
+    "If issues found: Ralph Loop remote fix log",
+    "Fixed artifacts pushed to D200",
+    "Possible ROM #2 (only if needed)",
+    "All issues resolved"
+  ],
+  verify:[
+    "All 3 demos pass on device after fixes",
+    "If ROM #2: device boots healthy",
+    "Ralph Loop log shows auto-resolution"
+  ],
+  commands:[
+    {label:"Remote Ralph Loop", cmd:"bash tools/ralph-loop.sh --mode=device-fix \\\n  --device=d200 --issues=auto-detect \\\n  --log=reports/device-fix.log"},
+    {label:"Re-push if needed", cmd:"# If ROM #2 needed:\nbash tools/deploy.sh --real --device=d200\nhdc shell reboot"}
+  ],
+  parallel:{text:"GZ02 Ralph Loop 自动修复 + 重编译 (1h)，GZ05 同时编译备选方案 (预测性编译)。编译 1h 内本地 PC 继续测试其他 Demo。D200 等待新产物 hdc push。D600 持续 SSIM 基线。", machines:["GZ02","GZ05","本地PC","D200","D600"]},
+  refs:[
+    {label:"Device fix protocol", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 655-657)"},
+    {label:"AI Pattern B11 Ralph Loop", path:"19.Document/19.3A.AI-DesignPatterns-Catalog/ (pattern B11)"}
+  ]
+},
+{
+  id:42, num:"#42", title:"Final Gate + Reports", phase:"Device", phaseClass:"device", day:"D7", steps:"312-320", duration:"3h",
+  machines:["Local","D200"],
+  input:[
+    "All device verification results",
+    "All mock verification results",
+    "SSIM data (D200 vs D600)",
+    "All test results"
+  ],
+  output:[
+    "D200 vs D600 SSIM comparison report",
+    "Final acceptance report (all 3 Demos)",
+    "deploy scripts documentation",
+    "Leadership presentation deck",
+    "**3 Demo Device Verification: COMPLETE**",
+    "Project ready for Phase 2 (179 API full coverage)"
+  ],
+  verify:[
+    "3/3 Demos pass on real device",
+    "SSIM D200 vs D600 > 0.80 for all demos",
+    "Acceptance report signed off",
+    "Leadership deck ready for presentation"
+  ],
+  commands:[
+    {label:"Final SSIM comparison", cmd:"python3 tools/verify.py --check=ssim-batch \\\n  --actual-dir=/tmp/d200-screenshots/ \\\n  --expected-dir=baselines/d600/ \\\n  --report=reports/final-ssim-comparison.html"},
+    {label:"Generate acceptance report", cmd:"python3 tools/generate-acceptance-report.py \\\n  --demos=1,2,3 --device=d200 \\\n  --output=reports/final-acceptance.html"},
+    {label:"Final gate", cmd:"python3 tools/confidence_gate.py --phase=final\n# Expected: FINAL_GATE: PASS"}
+  ],
+  parallel:{text:"本地 PC 生成最终报告 + D200 vs D600 SSIM 对比 + 领导材料。D200/D600 最终截图。GZ02/GZ05 空闲，随时支援。", machines:["本地PC","D200","D600","GZ02","GZ05"]},
+  refs:[
+    {label:"Final gate spec", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 658-660)"},
+    {label:"Leadership briefing", path:"MEMORY: project_leadership_notes.md"},
+    {label:"Experience criteria (7 dimensions, 23 acceptance)", path:"MEMORY: project_experience_criteria.md"},
+    {label:"Version strategy", path:"16.11-Main/WestlakeV3/MASTER-PLAN.md (lines 763-771)"}
+  ]
+}
+];
+
+// ============================================================
+// RENDER
+// ============================================================
+const sidebar = document.getElementById('sidebar-nav');
+const mainPanel = document.getElementById('main');
+const overviewEl = document.getElementById('overview');
+const cardContainer = document.getElementById('card-container');
+let currentIdx = -1; // -1 = overview
+
+// Build sidebar nav items
+const phaseGroups = {
+  'Phase 0': {cls:'p0', items:[]},
+  'Demo 1': {cls:'d1', items:[]},
+  'Demo 2': {cls:'d2', items:[]},
+  'Demo 3': {cls:'d3', items:[]},
+  'Device': {cls:'dv', items:[]}
+};
+deliverables.forEach(d => { phaseGroups[d.phase].items.push(d); });
+
+// Clear phase groups in sidebar and rebuild
+const groups = sidebar.querySelectorAll('.phase-group');
+groups.forEach((g,i) => {
+  const phases = Object.keys(phaseGroups);
+  const key = phases[i];
+  const pg = phaseGroups[key];
+  pg.items.forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'nav-item';
+    div.dataset.id = d.id;
+    div.innerHTML = '<span class="num">' + d.num + '</span><span class="title">' + d.title + '</span><span class="steps-badge">' + d.steps + '</span>';
+    div.onclick = () => showCard(d.id);
+    g.appendChild(div);
+  });
+});
+
+// Build overview
+overviewEl.innerHTML = buildOverview();
+
+// Build cards
+deliverables.forEach(d => {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.id = 'card-' + d.id;
+  div.innerHTML = buildCard(d);
+  cardContainer.appendChild(div);
+});
+
+function buildOverview() {
+  const totalSteps = 320;
+  const totalHours = 126;
+  const totalAPIs = 45;
+
+  let ganttRows = [
+    {label:'D1: Phase 0', cls:'p0', start:0, end:18, steps:'1-30'},
+    {label:'D2: Demo 1 (front)', cls:'d1', start:18, end:36, steps:'31-75'},
+    {label:'D3: Demo 1 (back)', cls:'d1', start:36, end:54, steps:'76-130'},
+    {label:'D4: Demo 2', cls:'d2', start:54, end:72, steps:'131-220'},
+    {label:'D5: Demo 3 (front)', cls:'d3', start:72, end:90, steps:'221-260'},
+    {label:'D6: Demo 3 (back)', cls:'d3', start:90, end:108, steps:'261-300'},
+    {label:'D7: Device Verify', cls:'dv', start:108, end:126, steps:'301-320'},
+  ];
+
+  let ganttHtml = ganttRows.map(r => {
+    const pct = ((r.end - r.start) / totalHours * 100);
+    const left = (r.start / totalHours * 100);
+    return '<tr><td style="width:160px">' + r.label + '</td><td style="width:80px;text-align:center">' + r.steps + '</td><td style="position:relative;height:28px"><div class="bar ' + r.cls + '" style="position:absolute;left:' + left + '%;width:' + pct + '%;top:5px"></div></td></tr>';
+  }).join('');
+
+  let summaryRows = deliverables.map(d => {
+    return '<tr>' +
+      '<td class="clickable" onclick="showCard(' + d.id + ')">' + d.num + '</td>' +
+      '<td class="clickable" onclick="showCard(' + d.id + ')">' + d.title + '</td>' +
+      '<td>' + d.phase + '</td>' +
+      '<td>' + d.day + '</td>' +
+      '<td>' + d.steps + '</td>' +
+      '<td>' + d.duration + '</td>' +
+      '<td>' + d.machines.join(', ') + '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<h2>WestlakeV3 Deliverables Overview</h2>' +
+    '<p style="color:var(--text-secondary);margin-bottom:24px">AI-autonomous adapter engine: run unmodified Android APKs on HarmonyOS. 1 person + N AI Agents, 7 days.</p>' +
+
+    '<div class="stats-grid">' +
+      '<div class="stat-card"><div class="val">42</div><div class="label">Deliverables</div></div>' +
+      '<div class="stat-card"><div class="val">320</div><div class="label">Original Steps</div></div>' +
+      '<div class="stat-card"><div class="val">7</div><div class="label">Days (126h)</div></div>' +
+      '<div class="stat-card"><div class="val">45</div><div class="label">APIs (25% of 179)</div></div>' +
+    '</div>' +
+
+    '<div class="gantt-container">' +
+      '<h3>Gantt Timeline (7 Days x 18h)</h3>' +
+      '<table class="gantt">' +
+        '<thead><tr><th>Day / Phase</th><th>Steps</th><th>Timeline (0-126h)</th></tr></thead>' +
+        '<tbody>' + ganttHtml + '</tbody>' +
+      '</table>' +
+    '</div>' +
+
+    // ---- 编译抵消三板斧 ----
+    '<div style="margin-bottom:40px">' +
+      '<h3 style="margin-bottom:16px;font-size:20px">编译抵消三板斧</h3>' +
+      '<p style="color:var(--text-secondary);margin-bottom:16px">核心矛盾：编译一次 = 1 小时，7天有 ~50 次编译需求。串行 = 40% 时间浪费。解法：流水线 + hdc push + 预测性编译。</p>' +
+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">' +
+
+      // 板斧1 流水线
+      '<div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd;border-radius:12px;padding:20px">' +
+        '<div style="font-size:14px;font-weight:800;color:#1e40af;margin-bottom:8px">板斧 1: 流水线</div>' +
+        '<div style="font-size:12px;color:#1e3a5f;margin-bottom:12px">编译 A 的 1h 内，本地 PC 已写完 B 代码</div>' +
+        '<div style="background:#1e293b;color:#e2e8f0;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;line-height:1.8">' +
+          '<div style="color:#60a5fa">GZ02  </div>' +
+          '<div>[<span style="color:#3b82f6">编译A 1h</span>]&nbsp;[<span style="color:#3b82f6">编译B 1h</span>]&nbsp;[<span style="color:#3b82f6">编译C 1h</span>]</div>' +
+          '<div style="color:#4ade80;margin-top:4px">本地PC</div>' +
+          '<div>&nbsp;&nbsp;[<span style="color:#4ade80">写B代码</span>]&nbsp;&nbsp;[<span style="color:#4ade80">写C代码</span>]&nbsp;&nbsp;[<span style="color:#4ade80">写D代码</span>]</div>' +
+          '<div style="color:#c084fc;margin-top:4px">GZ05</div>' +
+          '<div>&nbsp;&nbsp;&nbsp;&nbsp;[<span style="color:#c084fc">测A</span>]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span style="color:#c084fc">测B</span>]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span style="color:#c084fc">测C</span>]</div>' +
+        '</div>' +
+        '<div style="margin-top:8px;font-size:11px;color:#1e40af;font-weight:600">等效编译等待: 接近 0</div>' +
+      '</div>' +
+
+      // 板斧2 hdc push 免 ROM
+      '<div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #86efac;border-radius:12px;padding:20px">' +
+        '<div style="font-size:14px;font-weight:800;color:#166534;margin-bottom:8px">板斧 2: hdc push 免 ROM</div>' +
+        '<div style="font-size:12px;color:#14532d;margin-bottom:12px">加速比: 70min -> 5min = 14x</div>' +
+        '<table style="width:100%;font-size:11px;border-collapse:collapse">' +
+          '<tr style="background:#166534;color:white"><th style="padding:4px 6px;text-align:left">文件</th><th style="padding:4px 6px;text-align:center">重启?</th></tr>' +
+          '<tr style="background:#f0fdf4"><td style="padding:3px 6px;border-bottom:1px solid #bbf7d0">liboh_adapter_bridge.so</td><td style="padding:3px 6px;text-align:center;border-bottom:1px solid #bbf7d0;color:#166534;font-weight:700">否 (kill)</td></tr>' +
+          '<tr><td style="padding:3px 6px;border-bottom:1px solid #bbf7d0">framework.jar</td><td style="padding:3px 6px;text-align:center;border-bottom:1px solid #bbf7d0;color:#166534;font-weight:700">否 (kill)</td></tr>' +
+          '<tr style="background:#f0fdf4"><td style="padding:3px 6px;border-bottom:1px solid #bbf7d0">libbionic_compat.so</td><td style="padding:3px 6px;text-align:center;border-bottom:1px solid #bbf7d0;color:#166534;font-weight:700">否</td></tr>' +
+          '<tr><td style="padding:3px 6px;border-bottom:1px solid #bbf7d0">Layer 2 任意 .so</td><td style="padding:3px 6px;text-align:center;border-bottom:1px solid #bbf7d0;color:#166534;font-weight:700">否</td></tr>' +
+          '<tr style="background:#fef2f2"><td style="padding:3px 6px;border-bottom:1px solid #bbf7d0">appspawn-x</td><td style="padding:3px 6px;text-align:center;border-bottom:1px solid #bbf7d0;color:#dc2626;font-weight:700">是</td></tr>' +
+          '<tr style="background:#fef2f2"><td style="padding:3px 6px">OH 补丁 .z.so</td><td style="padding:3px 6px;text-align:center;color:#dc2626;font-weight:700">是</td></tr>' +
+        '</table>' +
+        '<div style="margin-top:8px;font-size:11px;color:#166534;font-weight:600">仅 2 次需要 ROM 重启</div>' +
+      '</div>' +
+
+      // 板斧3 预测性编译
+      '<div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:1px solid #c4b5fd;border-radius:12px;padding:20px">' +
+        '<div style="font-size:14px;font-weight:800;color:#5b21b6;margin-bottom:8px">板斧 3: 预测性编译</div>' +
+        '<div style="font-size:12px;color:#4c1d95;margin-bottom:12px">同时编两个版本，哪个先过用哪个</div>' +
+        '<div style="background:#1e293b;color:#e2e8f0;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;line-height:1.8">' +
+          '<div style="color:#3b82f6">GZ02 Docker:</div>' +
+          '<div>&nbsp;[<span style="color:#3b82f6">编译版本A: 保守方案</span>]</div>' +
+          '<div style="color:#c084fc;margin-top:4px">GZ05:</div>' +
+          '<div>&nbsp;[<span style="color:#c084fc">编译版本B: 激进方案</span>]</div>' +
+          '<div style="color:#fbbf24;margin-top:8px;font-weight:600">哪个先通过测试用哪个</div>' +
+        '</div>' +
+        '<div style="margin-top:8px;font-size:11px;color:#5b21b6;font-weight:600">消除单点失败风险</div>' +
+      '</div>' +
+
+      '</div>' + // end grid
+    '</div>' + // end 三板斧
+
+    // ---- 详细 Gantt Chart: 7天 x 8单元 ----
+    '<div style="margin-bottom:40px">' +
+      '<h3 style="margin-bottom:8px;font-size:20px">7 天 x 8 执行单元 并行调度甘特图</h3>' +
+      '<p style="color:var(--text-secondary);margin-bottom:16px;font-size:13px">每个色条代表一个执行单元的具体任务，色条长度按小时比例。</p>' +
+      '<div style="overflow-x:auto;border:1px solid var(--border);border-radius:8px">' +
+        '<table style="width:100%;min-width:1100px;border-collapse:collapse;font-size:11px">' +
+          '<thead><tr style="background:var(--sidebar-bg)">' +
+            '<th style="padding:8px;border:1px solid var(--border);width:80px;position:sticky;left:0;background:var(--sidebar-bg);z-index:1">Day</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:140px">GZ02 Docker</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:140px">GZ05</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:120px">GZ01</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:120px">GZ03</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:120px">HK01</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:140px">本地 PC</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:110px">D200</th>' +
+            '<th style="padding:8px;border:1px solid var(--border);width:110px">D600</th>' +
+          '</tr></thead>' +
+          '<tbody>' +
+
+          // D1
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D1<br><span style="font-size:10px;color:#888">Phase 0</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">验证已有产物 2h</div>' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">string_bridge编译 2h</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">预编译OH补丁 4h</div>' +
+              '<div style="background:#1d4ed8;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">预编译appspawn-x 4h</div>' +
+              '<div style="background:#1e40af;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">全栈链接验证 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">ART .so验证 2h</div>' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">2476测试基线 4h</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">预编译ART 4h</div>' +
+              '<div style="background:#5b21b6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Hello/Calc .dex 6h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0891b2;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">NFS挂载 2h</div>' +
+              '<div style="background:#0891b2;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">同步快照 4h</div>' +
+              '<div style="background:#0e7490;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">API行为回放 6h</div>' +
+              '<div style="background:#155e75;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">监控编译状态 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">待命</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#ea580c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">GitHub仓库 4h</div>' +
+              '<div style="background:#ea580c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">ci/auto-fix.yml 4h</div>' +
+              '<div style="background:#c2410c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">下载依赖 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">连接D200+D600 2h</div>' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">mock-hdc/adb编写 4h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">verify/ralph/conf 4h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Plugin骨架15个 4h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Phase 0 Gate 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#dc2626;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">快照采集 4h</div>' +
+              '<div style="background:#b91c1c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">收起 --</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#991b1b;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">快照采集 4h</div>' +
+              '<div style="background:#7f1d1d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">收起 --</div>' +
+            '</td>' +
+          '</tr>' +
+
+          // D2
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D2<br><span style="font-size:10px;color:#888">Demo1 前</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Logging .so 5min</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Activity Bridge 1h</div>' +
+              '<div style="background:#1d4ed8;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译AOSP补丁.jar 2h</div>' +
+              '<div style="background:#1e40af;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">收集产物->NFS 1h</div>' +
+              '<div style="background:#1e3a8a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Window Bridge 1h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">JVM: Logging 16用例 3h</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">JVM: Activity 50用例 4h</div>' +
+              '<div style="background:#5b21b6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">JVM: terminateSelf 3h</div>' +
+              '<div style="background:#4c1d95;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Activity联合测试 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0891b2;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">nm验证Logging 3h</div>' +
+              '<div style="background:#0e7490;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">LLM-Judge Logging 3h</div>' +
+              '<div style="background:#155e75;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">LLM-Judge Activity 4h</div>' +
+              '<div style="background:#164e63;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">AI回顾lessons 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0d9488;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">API行为对比 Logging 4h</div>' +
+              '<div style="background:#0f766e;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">nm验证 Activity 4h</div>' +
+              '<div style="background:#115e59;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">行为对比 Activity 6h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Logging Mock+Bridge 3h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Activity Mock 状态机 3h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">terminateSelf Bridge 4h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Window Mock开始 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+          '</tr>' +
+
+          // D3
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D3<br><span style="font-size:10px;color:#888">Demo1 后</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Rendering全部 1h</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">产物->NFS 1h</div>' +
+              '<div style="background:#1d4ed8;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Input Bridge 30min</div>' +
+              '<div style="background:#1e40af;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Calculator扩展 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">JVM: Window测试 4h</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">dalvikvm全栈HelloWorld 4h</div>' +
+              '<div style="background:#5b21b6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">2476完整回归 4h</div>' +
+              '<div style="background:#4c1d95;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Calculator逻辑JVM 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0891b2;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">nm验证 Window 4h</div>' +
+              '<div style="background:#0e7490;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">符号全量验证 6h</div>' +
+              '<div style="background:#155e75;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">LLM-Judge Demo1 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0d9488;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">SSIM基线 4h</div>' +
+              '<div style="background:#0f766e;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">行为对比 Window 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Swarm 3路: Canvas/Pen/Font 6h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">组合渲染+HelloWorld PNG 4h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Confidence评估 2h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Demo1 PASS + Calculator Mock 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+          '</tr>' +
+
+          // D4
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D4<br><span style="font-size:10px;color:#888">Demo 2</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">收集Input产物 1h</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译Prefs Mock版 30min</div>' +
+              '<div style="background:#1d4ed8;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译McD相关Bridge 30min</div>' +
+              '<div style="background:#1e40af;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">自愈buffer 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Calculator全栈JVM 4h</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">41用例测试矩阵 4h</div>' +
+              '<div style="background:#5b21b6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Calculator SSIM对比 2h</div>' +
+              '<div style="background:#4c1d95;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">回归+自愈 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0891b2;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">nm验证 Input 3h</div>' +
+              '<div style="background:#0e7490;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">LLM-Judge Input 3h</div>' +
+              '<div style="background:#155e75;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">监控 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0d9488;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">行为对比 Input 4h</div>' +
+              '<div style="background:#0f766e;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">SSIM Calculator 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">21按钮点击测试 4h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">算术边界测试 4h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Demo2 PASS 2h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">AI自主修复 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+          '</tr>' +
+
+          // D5
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D5<br><span style="font-size:10px;color:#888">Demo3 前</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">构建McD.dex 3h</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">编译系统层Prefs 1h</div>' +
+              '<div style="background:#1d4ed8;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Prefs Bridge编写 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">MockDonalds JVM验证 4h</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Bug复现: 加购关重开 4h</div>' +
+              '<div style="background:#5b21b6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Preferences行为测试 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#ea580c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">完善auto-fix.yml 4h</div>' +
+              '<div style="background:#c2410c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">测试Issue->workflow 4h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">SharedPrefs Bug编写 3h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">GitHub Actions调试 3h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">演示: 提Issue 0.5h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">演示: AI修复+hotfix 1.5h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#dc2626;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">连接准备 2h</div>' +
+              '<div style="background:#b91c1c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">运行McD发现Bug 2h</div>' +
+              '<div style="background:#991b1b;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">验证hotfix 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+          '</tr>' +
+
+          // D6
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D6<br><span style="font-size:10px;color:#888">Demo3 后</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">系统层Prefs集成 3h</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">全量编译 1h</div>' +
+              '<div style="background:#1d4ed8;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">全量产物->NFS 2h</div>' +
+              '<div style="background:#1e40af;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">预编译D7部署包 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">全量回归Demo1+2+McD 6h</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">2476测试 4h</div>' +
+              '<div style="background:#5b21b6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">SSIM对比 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0891b2;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">SSIM全量 6h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#0d9488;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">行为对比全量 6h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#ea580c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Issue自动关闭 1h</div>' +
+              '<div style="background:#c2410c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">v0.4.0 Release 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Confidence评估 3h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">v0.4.0 Release 2h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Demo3 PASS 1h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">领导材料 2h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">已收起</td>' +
+          '</tr>' +
+
+          // D7
+          '<tr>' +
+            '<td style="padding:6px;border:1px solid var(--border);font-weight:700;background:#f8f9fa;position:sticky;left:0;z-index:1">D7<br><span style="font-size:10px;color:#888">真机</span></td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#3b82f6;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">待命修复编译 --</div>' +
+              '<div style="background:#2563eb;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">如需ROM#2编译 1h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#7c3aed;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">待命测试 --</div>' +
+              '<div style="background:#6d28d9;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">如需预测性编译B 1h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top;color:#999;font-size:10px">空闲</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#16a34a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">推送全部产物 2h</div>' +
+              '<div style="background:#15803d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">安装3个Demo 3h</div>' +
+              '<div style="background:#166534;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">AI截图验证SSIM 4h</div>' +
+              '<div style="background:#14532d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">如需Ralph Loop修复 3h</div>' +
+              '<div style="background:#052e16;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">最终报告+领导材料 3h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#dc2626;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">重启ROM#1 1.5h</div>' +
+              '<div style="background:#b91c1c;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">HelloWorld 2h</div>' +
+              '<div style="background:#991b1b;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">Calculator 1.5h</div>' +
+              '<div style="background:#7f1d1d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">MockDonalds 2h</div>' +
+              '<div style="background:#450a0a;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">最终截图 1h</div>' +
+            '</td>' +
+            '<td style="padding:4px;border:1px solid var(--border);vertical-align:top">' +
+              '<div style="background:#991b1b;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">SSIM基线采集 4h</div>' +
+              '<div style="background:#7f1d1d;color:white;border-radius:4px;padding:3px 6px;margin:2px 0;font-size:10px">最终截图 1h</div>' +
+            '</td>' +
+          '</tr>' +
+
+          '</tbody></table>' +
+      '</div>' + // end overflow
+      '<div style="margin-top:8px;display:flex;gap:12px;flex-wrap:wrap;font-size:11px">' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#3b82f6;border-radius:2px;vertical-align:middle"></span> GZ02 Docker</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#7c3aed;border-radius:2px;vertical-align:middle"></span> GZ05</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#0891b2;border-radius:2px;vertical-align:middle"></span> GZ01</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#0d9488;border-radius:2px;vertical-align:middle"></span> GZ03</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#ea580c;border-radius:2px;vertical-align:middle"></span> HK01</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#16a34a;border-radius:2px;vertical-align:middle"></span> 本地 PC</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#dc2626;border-radius:2px;vertical-align:middle"></span> D200</span>' +
+        '<span><span style="display:inline-block;width:12px;height:12px;background:#7f1d1d;border-radius:2px;vertical-align:middle"></span> D600</span>' +
+      '</div>' +
+    '</div>' + // end detailed gantt
+
+    // ---- 编译时间抵消统计 ----
+    '<div style="margin-bottom:40px">' +
+      '<h3 style="margin-bottom:12px;font-size:20px">编译时间抵消统计</h3>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px">' +
+        '<div style="background:#f0f9ff;border:2px solid #3b82f6;border-radius:12px;padding:20px;text-align:center">' +
+          '<div style="font-size:48px;font-weight:900;color:#1e40af">82%</div>' +
+          '<div style="font-size:14px;color:#3b82f6;font-weight:600">编译时间被并行工作抵消</div>' +
+          '<div style="font-size:12px;color:#64748b;margin-top:8px">11h 总编译 / 仅 2h 实际等待</div>' +
+        '</div>' +
+        '<div style="background:#fefce8;border:2px solid #eab308;border-radius:12px;padding:20px;text-align:center">' +
+          '<div style="font-size:48px;font-weight:900;color:#a16207">14x</div>' +
+          '<div style="font-size:14px;color:#ca8a04;font-weight:600">hdc push 加速比</div>' +
+          '<div style="font-size:12px;color:#64748b;margin-top:8px">70min (传统ROM) -> 5min (增量push)</div>' +
+        '</div>' +
+      '</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden">' +
+        '<thead><tr style="background:var(--sidebar-bg)">' +
+          '<th style="padding:8px;text-align:left;border:1px solid var(--border)">编译任务</th>' +
+          '<th style="padding:8px;text-align:center;border:1px solid var(--border);width:60px">时长</th>' +
+          '<th style="padding:8px;text-align:center;border:1px solid var(--border);width:80px">在哪台</th>' +
+          '<th style="padding:8px;text-align:left;border:1px solid var(--border)">并行做什么 (其他机器)</th>' +
+        '</tr></thead>' +
+        '<tbody>' +
+          '<tr><td style="padding:6px 8px;border:1px solid var(--border)">OH 补丁 libabilityms.z.so</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:写Activity Bridge / GZ05:JVM测试</td></tr>' +
+          '<tr style="background:#f8f9fa"><td style="padding:6px 8px;border:1px solid var(--border)">OH 补丁 libappms.z.so</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:写Window Bridge / GZ05:测Activity</td></tr>' +
+          '<tr><td style="padding:6px 8px;border:1px solid var(--border)">OH 补丁 BMS+Scene</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:写Rendering / GZ05:测Window</td></tr>' +
+          '<tr style="background:#f8f9fa"><td style="padding:6px 8px;border:1px solid var(--border)">ART 交叉编译 (如需)</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#7c3aed;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ05</span></td><td style="border:1px solid var(--border);padding:6px 8px">GZ02:编OH补丁 / 本地:写Bridge</td></tr>' +
+          '<tr><td style="padding:6px 8px;border:1px solid var(--border)">Activity Bridge .so</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:写Window / GZ05:测Activity</td></tr>' +
+          '<tr style="background:#f8f9fa"><td style="padding:6px 8px;border:1px solid var(--border)">Window Bridge .so</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:写Rendering / GZ05:测Window</td></tr>' +
+          '<tr><td style="padding:6px 8px;border:1px solid var(--border)">Rendering .so (47 API)</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:测试+SSIM / GZ05:dalvikvm全栈</td></tr>' +
+          '<tr style="background:#f8f9fa"><td style="padding:6px 8px;border:1px solid var(--border)">Input Bridge .so</td><td style="text-align:center;border:1px solid var(--border)">30m</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:Calculator逻辑</td></tr>' +
+          '<tr><td style="padding:6px 8px;border:1px solid var(--border)">Preferences .so</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:MockDonalds / HK01:GitHub</td></tr>' +
+          '<tr style="background:#f8f9fa"><td style="padding:6px 8px;border:1px solid var(--border)">全量编译 (最终)</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">GZ05:回归 / 本地:报告</td></tr>' +
+          '<tr><td style="padding:6px 8px;border:1px solid var(--border)">D7 修复编译 (如需)</td><td style="text-align:center;border:1px solid var(--border)">1h</td><td style="text-align:center;border:1px solid var(--border)"><span style="background:#3b82f6;color:white;padding:2px 6px;border-radius:4px;font-size:10px">GZ02</span></td><td style="border:1px solid var(--border);padding:6px 8px">本地:其他Demo测试 / GZ05:预测性编译B</td></tr>' +
+          '<tr style="background:#eff6ff;font-weight:700"><td style="padding:8px;border:1px solid var(--border)">总计</td><td style="text-align:center;border:1px solid var(--border)">~11h</td><td style="text-align:center;border:1px solid var(--border)">--</td><td style="border:1px solid var(--border);padding:8px;color:#1e40af">等效等待: ~2h (仅前 2 次无法完全抵消)</td></tr>' +
+        '</tbody>' +
+      '</table>' +
+    '</div>' + // end 编译统计
+
+    // ---- hdc push 迭代循环图 ----
+    '<div style="margin-bottom:40px">' +
+      '<h3 style="margin-bottom:12px;font-size:20px">hdc push 免 ROM 迭代循环</h3>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">' +
+        '<div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:12px;padding:20px">' +
+          '<div style="font-size:14px;font-weight:800;color:#166534;margin-bottom:12px">正常开发循环 (5min/轮)</div>' +
+          '<div style="display:flex;flex-direction:column;gap:8px">' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="background:#16a34a;color:white;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;min-width:80px;text-align:center">本地 PC</div>' +
+              '<div style="font-size:11px">改 Bridge 代码 -> git push</div>' +
+            '</div>' +
+            '<div style="text-align:center;color:#16a34a;font-size:16px;font-weight:700">&#8595;</div>' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="background:#3b82f6;color:white;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;min-width:80px;text-align:center">GZ02</div>' +
+              '<div style="font-size:11px">自动编译 .so (5min 增量)</div>' +
+            '</div>' +
+            '<div style="text-align:center;color:#3b82f6;font-size:16px;font-weight:700">&#8595;</div>' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="background:#eab308;color:white;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;min-width:80px;text-align:center">NFS</div>' +
+              '<div style="font-size:11px">GZ02 -> NFS -> 本地 PC 产物同步</div>' +
+            '</div>' +
+            '<div style="text-align:center;color:#eab308;font-size:16px;font-weight:700">&#8595;</div>' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="background:#dc2626;color:white;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;min-width:80px;text-align:center">D200</div>' +
+              '<div style="font-size:11px">hdc file send bridge.so /system/lib64/</div>' +
+            '</div>' +
+            '<div style="text-align:center;color:#dc2626;font-size:16px;font-weight:700">&#8595;</div>' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+              '<div style="background:#dc2626;color:white;border-radius:6px;padding:6px 10px;font-size:11px;font-weight:600;min-width:80px;text-align:center">D200</div>' +
+              '<div style="font-size:11px">kill appspawn-x (不重启!) -> 自动重拉起 -> 测试</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="background:#fef2f2;border:2px solid #ef4444;border-radius:12px;padding:20px">' +
+          '<div style="font-size:14px;font-weight:800;color:#991b1b;margin-bottom:12px">需要 ROM 的场景 (仅 2 次)</div>' +
+          '<div style="display:flex;flex-direction:column;gap:12px">' +
+            '<div style="background:white;border:1px solid #fca5a5;border-radius:8px;padding:12px">' +
+              '<div style="font-size:12px;font-weight:700;color:#dc2626">ROM #1: 首次推送</div>' +
+              '<div style="font-size:11px;color:#64748b;margin-top:4px">OH 补丁 .z.so (替换系统服务) + appspawn-x.cfg (init 配置)</div>' +
+            '</div>' +
+            '<div style="background:white;border:1px solid #fca5a5;border-radius:8px;padding:12px">' +
+              '<div style="font-size:12px;font-weight:700;color:#dc2626">ROM #2: D7 修复 (如需)</div>' +
+              '<div style="font-size:11px;color:#64748b;margin-top:4px">仅在 D7 真机发现系统级问题时需要</div>' +
+            '</div>' +
+            '<div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:12px">' +
+              '<div style="font-size:12px;font-weight:700;color:#166534">其余所有迭代: hdc push + kill</div>' +
+              '<div style="font-size:11px;color:#64748b;margin-top:4px">Bridge .so 改了直接 push，kill 进程自动重拉起，5 分钟一轮</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' + // end hdc push diagram
+
+    // ---- 意图驱动 -> 多Agent -> 自我进化 ----
+    '<div style="margin-bottom:40px">' +
+      '<h3 style="margin-bottom:12px;font-size:20px">意图驱动 -> 多 Agent 协作 -> 自我进化</h3>' +
+      '<p style="color:var(--text-secondary);margin-bottom:16px;font-size:13px">5 台服务器 = 5 个专职 Agent，通过 NFS/Git 自动协调，无需人工调度。</p>' +
+      '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">' +
+
+        '<div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:2px solid #3b82f6;border-radius:12px;padding:16px;text-align:center">' +
+          '<div style="font-size:24px;font-weight:900;color:#1e40af">GZ02</div>' +
+          '<div style="font-size:11px;font-weight:700;color:#3b82f6;margin:4px 0">Agent-Compile</div>' +
+          '<div style="font-size:10px;color:#64748b">16核/60G Docker<br>OH+AOSP 主编译<br>检测 git push -> 自动编译 -> 产物->NFS</div>' +
+        '</div>' +
+
+        '<div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:2px solid #7c3aed;border-radius:12px;padding:16px;text-align:center">' +
+          '<div style="font-size:24px;font-weight:900;color:#5b21b6">GZ05</div>' +
+          '<div style="font-size:11px;font-weight:700;color:#7c3aed;margin:4px 0">Agent-Test</div>' +
+          '<div style="font-size:10px;color:#64748b">16核/60G JDK11<br>ART编译 + JVM测试<br>检测 NFS 新产物 -> 测试 -> 结果->NFS</div>' +
+        '</div>' +
+
+        '<div style="background:linear-gradient(135deg,#ecfeff,#cffafe);border:2px solid #0891b2;border-radius:12px;padding:16px;text-align:center">' +
+          '<div style="font-size:24px;font-weight:900;color:#155e75">GZ01</div>' +
+          '<div style="font-size:11px;font-weight:700;color:#0891b2;margin:4px 0">Agent-Verify</div>' +
+          '<div style="font-size:10px;color:#64748b">2核/4G NFS<br>readelf/nm 符号验证<br>检测产物 -> 验证 -> 报告->NFS</div>' +
+        '</div>' +
+
+        '<div style="background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border:2px solid #0d9488;border-radius:12px;padding:16px;text-align:center">' +
+          '<div style="font-size:24px;font-weight:900;color:#115e59">GZ03</div>' +
+          '<div style="font-size:11px;font-weight:700;color:#0d9488;margin:4px 0">Agent-Judge</div>' +
+          '<div style="font-size:10px;color:#64748b">2核/4G NFS<br>LLM 审查 + SSIM<br>检测代码变更 -> 审查 -> 结果->NFS</div>' +
+        '</div>' +
+
+        '<div style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:2px solid #ea580c;border-radius:12px;padding:16px;text-align:center">' +
+          '<div style="font-size:24px;font-weight:900;color:#9a3412">HK01</div>' +
+          '<div style="font-size:11px;font-weight:700;color:#ea580c;margin:4px 0">Agent-CI</div>' +
+          '<div style="font-size:10px;color:#64748b">2核/8G 香港<br>GitHub + CI/CD<br>检测 push -> Actions -> CI 结果</div>' +
+        '</div>' +
+
+      '</div>' +
+
+      '<div style="background:#1e293b;color:#e2e8f0;border-radius:12px;padding:20px;font-family:monospace;font-size:12px;line-height:1.8">' +
+        '<div style="color:#fbbf24;font-weight:700;margin-bottom:8px">// 意图驱动示例</div>' +
+        '<div>人(本地PC): <span style="color:#4ade80">"现在做 Activity Bridge"</span></div>' +
+        '<div style="color:#64748b">&nbsp;&nbsp;|  意图分发</div>' +
+        '<div><span style="color:#60a5fa">GZ02</span>: 收到 -> 准备编译环境 -> 等待代码</div>' +
+        '<div><span style="color:#c084fc">GZ05</span>: 收到 -> 准备JVM测试环境 -> 加载Mock</div>' +
+        '<div><span style="color:#22d3ee">GZ01</span>: 收到 -> 准备nm/readelf验证脚本</div>' +
+        '<div><span style="color:#2dd4bf">GZ03</span>: 收到 -> 准备LLM-Judge审查标准</div>' +
+        '<div><span style="color:#fb923c">HK01</span>: 收到 -> 准备CI workflow触发条件</div>' +
+        '<div style="color:#fbbf24;margin-top:12px;font-weight:700">// 自我进化</div>' +
+        '<div>Ralph Loop 发现编译错误 -> 自动分析 -> 修改代码 -> 重编 -> 测试</div>' +
+        '<div>如 GZ02 繁忙 -> <span style="color:#c084fc">自动切到 GZ05</span> 编译 (预测性编译)</div>' +
+        '<div>记录 lessons -> 下次同类错误直接跳过</div>' +
+      '</div>' +
+    '</div>' + // end 多Agent
+
+    '<h3 style="margin-bottom:12px">Traditional vs WestlakeV3</h3>' +
+    '<table class="comparison-table">' +
+      '<thead><tr><th></th><th>Traditional Approach</th><th>WestlakeV3</th></tr></thead>' +
+      '<tbody>' +
+        '<tr><td>Bug Discovery</td><td>Human review, schedule fix</td><td><strong>AI auto-locates in 3 min</strong></td></tr>' +
+        '<tr><td>Quick Fix</td><td>None, wait for schedule</td><td><strong>15 min app-layer hotfix</strong></td></tr>' +
+        '<tr><td>Root Fix</td><td>Large team, months</td><td><strong>AI auto ROM in 2 weeks</strong></td></tr>' +
+        '<tr><td>Team Size</td><td>10-20 engineers</td><td><strong>1 person + AI</strong></td></tr>' +
+        '<tr><td>Scaling</td><td>Hire more people</td><td><strong>Issue-driven auto-evolution</strong></td></tr>' +
+        '<tr><td>End State</td><td>People leave, project stops</td><td><strong>GitHub self-sustaining</strong></td></tr>' +
+      '</tbody>' +
+    '</table>' +
+
+    '<h3 style="margin:24px 0 12px">All 42 Deliverables</h3>' +
+    '<div style="max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">' +
+      '<table class="deliverable-summary">' +
+        '<thead><tr><th>#</th><th>Title</th><th>Phase</th><th>Day</th><th>Steps</th><th>Duration</th><th>Machines</th></tr></thead>' +
+        '<tbody>' + summaryRows + '</tbody>' +
+      '</table>' +
+    '</div>';
+}
+
+function buildCard(d) {
+  const phaseTag = d.phaseClass === 'phase' ? 'phase' : d.phaseClass;
+
+  let cmdHtml = (d.commands || []).map((c, i) => {
+    const id = 'cmd-' + d.id + '-' + i;
+    return '<div style="margin-bottom:12px">' +
+      '<div style="font-size:12px;font-weight:600;margin-bottom:4px;color:var(--text-secondary)">' + escHtml(c.label) + '</div>' +
+      '<div class="cmd-block" id="' + id + '">' + escHtml(c.cmd) + '<button class="copy-btn" onclick="copyCmd(\'' + id + '\')">Copy</button></div>' +
+    '</div>';
+  }).join('');
+
+  let refHtml = (d.refs || []).map(r => {
+    return '<li><span class="ref-label">' + escHtml(r.label) + '</span><br><span class="ref-path">' + escHtml(r.path) + '</span></li>';
+  }).join('');
+
+  let inputHtml = (d.input || []).map(i => '<li><code>' + escHtml(i) + '</code></li>').join('');
+  let outputHtml = (d.output || []).map(o => '<li>' + escHtml(o) + '</li>').join('');
+  let verifyHtml = (d.verify || []).map(v => '<li>' + escHtml(v) + '</li>').join('');
+
+  let parallelHtml = d.parallel ? '<div class="parallel-box"><strong>Parallel:</strong> ' + escHtml(d.parallel.text) + '<br><strong>Machines:</strong> ' + d.parallel.machines.join(', ') + '</div>' : '';
+
+  let machTags = d.machines.map(m => '<span class="tag machine">' + m + '</span>').join('');
+
+  return '<div class="card-header">' +
+      '<div class="card-num">' + d.num + '</div>' +
+      '<div class="card-title">' + escHtml(d.title) + '</div>' +
+      '<div class="card-tags">' +
+        '<span class="tag ' + phaseTag + '">' + d.phase + '</span>' +
+        '<span class="tag day">' + d.day + '</span>' +
+        '<span class="tag duration">' + d.duration + '</span>' +
+        machTags +
+      '</div>' +
+    '</div>' +
+
+    '<div class="section">' +
+      '<div class="section-title">Input</div>' +
+      '<div class="section-body"><ul>' + inputHtml + '</ul></div>' +
+    '</div>' +
+
+    '<div class="section">' +
+      '<div class="section-title">Output</div>' +
+      '<div class="section-body"><ul>' + outputHtml + '</ul></div>' +
+    '</div>' +
+
+    '<div class="section">' +
+      '<div class="section-title">Verification</div>' +
+      '<div class="section-body"><ul>' + verifyHtml + '</ul></div>' +
+    '</div>' +
+
+    '<div class="section">' +
+      '<div class="section-title">Commands</div>' +
+      '<div class="section-body">' + cmdHtml + '</div>' +
+    '</div>' +
+
+    (parallelHtml ? '<div class="section"><div class="section-title">Parallel</div>' + parallelHtml + '</div>' : '') +
+
+    '<div class="section">' +
+      '<div class="section-title">References</div>' +
+      '<div class="section-body"><ul class="ref-list">' + refHtml + '</ul></div>' +
+    '</div>' +
+
+    '<div class="section">' +
+      '<div class="original-steps">Original steps covered: Step ' + d.steps + ' (from MASTER-PLAN.md 320-step plan)</div>' +
+    '</div>';
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function showOverview() {
+  currentIdx = -1;
+  overviewEl.classList.add('visible');
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('.overview-btn').classList.add('active');
+  mainPanel.scrollTop = 0;
+}
+
+function showCard(id) {
+  currentIdx = deliverables.findIndex(d => d.id === id);
+  overviewEl.classList.remove('visible');
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('visible'));
+  document.getElementById('card-' + id).classList.add('visible');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navItem = document.querySelector('.nav-item[data-id="' + id + '"]');
+  if (navItem) {
+    navItem.classList.add('active');
+    navItem.scrollIntoView({block:'nearest'});
+  }
+  mainPanel.scrollTop = 0;
+}
+
+function copyCmd(id) {
+  const el = document.getElementById(id);
+  const text = el.textContent.replace('Copy','').replace('Copied!','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { showOverview(); return; }
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (currentIdx < deliverables.length - 1) {
+      showCard(deliverables[currentIdx + 1].id);
+    }
+  }
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (currentIdx > 0) {
+      showCard(deliverables[currentIdx - 1].id);
+    } else if (currentIdx === 0) {
+      showOverview();
+    }
+  }
+});
+</script>
+</body>
+</html>

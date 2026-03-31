@@ -1,0 +1,79 @@
+name: Auto-Fix — AI responds to Issues
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  ai-auto-fix:
+    if: contains(github.event.issue.labels.*.name, 'bug') || contains(github.event.issue.labels.*.name, 'api-gap')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: AI Analyze Issue
+        id: analyze
+        uses: anthropics/claude-code-action@beta
+        with:
+          prompt: |
+            You are the WestLake Adapter AI maintainer.
+
+            A user reported this issue:
+            Title: ${{ github.event.issue.title }}
+            Body: ${{ github.event.issue.body }}
+
+            Your job:
+            1. Analyze the issue — is it a missing View mapping, attribute mapping, or logic bug?
+            2. If it's a missing mapping, add it to adapter/apk-to-arkts.py
+            3. If it's a bug, fix the relevant code
+            4. Add a test case in the CI workflow if appropriate
+            5. Create a clear commit message explaining the fix
+
+            The adapter converts Android APK layouts to ArkTS/ArkUI.
+            Key file: adapter/apk-to-arkts.py (view_to_arkui function)
+
+            After fixing, verify by running:
+              python3 adapter/apk-to-arkts.py demos/hello-world/build/base.apk /tmp/test-output
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Create PR
+        if: success()
+        run: |
+          git config user.name "westlake-bot"
+          git config user.email "bot@westlake-adapter"
+          BRANCH="auto-fix/issue-${{ github.event.issue.number }}"
+          git checkout -b "$BRANCH"
+          git add -A
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "fix: auto-resolve #${{ github.event.issue.number }}
+
+          AI-generated fix for: ${{ github.event.issue.title }}
+
+          Co-Authored-By: Claude <noreply@anthropic.com>"
+          git push origin "$BRANCH"
+          gh pr create --title "fix: #${{ github.event.issue.number }} ${{ github.event.issue.title }}" \
+            --body "Auto-generated fix for #${{ github.event.issue.number }}
+
+          ## Changes
+          See diff for details.
+
+          ## Test
+          - [ ] CI passes
+          - [ ] Visual comparison matches baseline
+
+          Closes #${{ github.event.issue.number }}" \
+            --base main --head "$BRANCH"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on Issue
+        if: success()
+        run: |
+          gh issue comment ${{ github.event.issue.number }} \
+            --body "AI Bot has analyzed this issue and created a fix PR. Please review."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

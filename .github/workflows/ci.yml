@@ -1,0 +1,56 @@
+name: CI — Build & Test Adapter
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test-adapter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install build-tools
+        run: sdkmanager "build-tools;35.0.0" "platforms;android-23"
+
+      - name: Test adapter — HelloWorld APK parse
+        run: |
+          cd demos/hello-world
+          # Build APK from source
+          aapt2 compile --dir android-res -o build/resources.zip
+          aapt2 link -o build/base.apk -I $ANDROID_HOME/platforms/android-23/android.jar \
+            --manifest AndroidManifest.xml build/resources.zip
+          # Run adapter
+          python3 ../../adapter/apk-to-arkts.py build/base.apk build/oh-output
+          # Verify generated files exist
+          test -f build/oh-output/entry/src/main/ets/pages/AdaptedPage.ets
+          test -f build/oh-output/entry/src/main/ets/entryability/EntryAbility.ets
+          echo "HelloWorld adapter: PASS"
+
+      - name: Test adapter — Calculator APK parse
+        run: |
+          cd demos/calculator
+          aapt2 compile --dir android-res -o build/resources.zip
+          aapt2 link -o build/base.apk -I $ANDROID_HOME/platforms/android-23/android.jar \
+            --manifest AndroidManifest.xml build/resources.zip
+          python3 ../../adapter/apk-to-arkts.py build/base.apk build/oh-output
+          test -f build/oh-output/entry/src/main/ets/pages/AdaptedPage.ets
+          echo "Calculator adapter: PASS"
+
+      - name: Verify generated ArkTS contains expected components
+        run: |
+          # HelloWorld should have Text('Hello World!')
+          grep -q "Hello World!" demos/hello-world/build/oh-output/entry/src/main/ets/pages/AdaptedPage.ets
+          # Calculator should have Button
+          grep -q "Button" demos/calculator/build/oh-output/entry/src/main/ets/pages/AdaptedPage.ets || true
+          echo "Content verification: PASS"

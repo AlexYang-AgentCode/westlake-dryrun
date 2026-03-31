@@ -1,0 +1,44 @@
+boundary: 1
+name: Activity/Ability Management
+priority: P0
+complexity: high
+api_count: 3
+kernel_shared: true
+
+apis:
+  - name: startAbility
+    jni_sig: "int startAbility(String bundleName, String abilityName, String params)"
+    android: "ActivityManager.startActivity(Intent)"
+    oh: "AAFwk::AbilityManagerClient::StartAbility(Want)"
+    mock: "MiniActivityManager.startActivity(intent) → 状态机模拟"
+    confidence: 0.85
+    hanbing_impl: "Task 51,72 — nativeStartAbility via oh_ability_manager_client.cpp"
+    yue_impl: "MiniActivityManager 完整生命周期状态机"
+
+  - name: terminateSelf
+    jni_sig: "void terminateSelf()"
+    android: "Activity.finish()"
+    oh: "TerminateSelf()"
+    mock: "状态机 → DESTROYED"
+    confidence: 0.90
+
+  - name: checkPermission
+    jni_sig: "int checkPermission(String permission)"
+    android: "Context.checkSelfPermission(permission)"
+    oh: "AccessTokenKit::VerifyAccessToken()"
+    mock: "return PERMISSION_GRANTED"
+    confidence: 0.88
+
+dependencies:
+  - "libabilityms.z.so (OH 补丁)"
+  - "libappms.z.so (OH 补丁)"
+  - "AOSP ActivityThread.java (补丁)"
+  - "AOSP ActivityManager.java (补丁)"
+
+verification:
+  agent_confirmable: true
+  method: |
+    1. hilog 检查生命周期回调 (onCreate→onResume)
+    2. aa dump 确认 Ability 栈状态
+    3. API 行为对比: 主机 vs D600 录制基线
+  device_required: false  # Mock 可覆盖

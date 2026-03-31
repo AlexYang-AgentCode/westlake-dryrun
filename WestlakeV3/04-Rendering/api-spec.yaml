@@ -1,0 +1,92 @@
+boundary: 4
+name: Rendering/Canvas
+priority: P0
+complexity: high
+api_count: 47
+kernel_shared: true
+note: "Android Canvas 底层用 Skia, OH Drawing 也用 Skia — 翻译层薄"
+
+subgroups:
+  - name: Canvas Drawing
+    count: 16
+    apis:
+      - { name: canvasDrawRect, oh: OH_Drawing_Canvas_DrawRect }
+      - { name: canvasDrawCircle, oh: OH_Drawing_Canvas_DrawCircle }
+      - { name: canvasDrawLine, oh: OH_Drawing_Canvas_DrawLine }
+      - { name: canvasDrawText, oh: OH_Drawing_Canvas_DrawText }
+      - { name: canvasDrawPath, oh: OH_Drawing_Canvas_DrawPath }
+      - { name: canvasDrawBitmap, oh: OH_Drawing_Canvas_DrawBitmap }
+      - { name: canvasDrawColor, oh: OH_Drawing_Canvas_DrawColor }
+      - { name: canvasDrawArc, oh: OH_Drawing_Canvas_DrawArc }
+      - { name: canvasDrawOval, oh: OH_Drawing_Canvas_DrawOval }
+      - { name: canvasDrawRoundRect, oh: OH_Drawing_Canvas_DrawRoundRect }
+      - { name: canvasClipRect, oh: OH_Drawing_Canvas_ClipRect }
+      - { name: canvasClipPath, oh: OH_Drawing_Canvas_ClipPath }
+      - { name: canvasSave, oh: OH_Drawing_Canvas_Save }
+      - { name: canvasRestore, oh: OH_Drawing_Canvas_Restore }
+      - { name: canvasTranslate, oh: OH_Drawing_Canvas_Translate }
+      - { name: canvasRotate, oh: OH_Drawing_Canvas_Rotate }
+
+  - name: Pen
+    count: 6
+    apis:
+      - { name: penCreate, oh: OH_Drawing_Pen_Create }
+      - { name: penDestroy, oh: OH_Drawing_Pen_Destroy }
+      - { name: penSetColor, oh: OH_Drawing_Pen_SetColor }
+      - { name: penSetWidth, oh: OH_Drawing_Pen_SetWidth }
+      - { name: penSetAntiAlias, oh: OH_Drawing_Pen_SetAntiAlias }
+      - { name: penSetCap, oh: OH_Drawing_Pen_SetCap }
+
+  - name: Brush
+    count: 3
+    apis:
+      - { name: brushCreate, oh: OH_Drawing_Brush_Create }
+      - { name: brushDestroy, oh: OH_Drawing_Brush_Destroy }
+      - { name: brushSetColor, oh: OH_Drawing_Brush_SetColor }
+
+  - name: Path
+    count: 9
+    apis:
+      - { name: pathCreate, oh: OH_Drawing_Path_Create }
+      - { name: pathDestroy, oh: OH_Drawing_Path_Destroy }
+      - { name: pathMoveTo, oh: OH_Drawing_Path_MoveTo }
+      - { name: pathLineTo, oh: OH_Drawing_Path_LineTo }
+      - { name: pathQuadTo, oh: OH_Drawing_Path_QuadTo }
+      - { name: pathCubicTo, oh: OH_Drawing_Path_CubicTo }
+      - { name: pathClose, oh: OH_Drawing_Path_Close }
+      - { name: pathReset, oh: OH_Drawing_Path_Reset }
+      - { name: pathAddRect, oh: OH_Drawing_Path_AddRect }
+
+  - name: Bitmap
+    count: 6
+    apis:
+      - { name: bitmapCreate, oh: OH_Drawing_Bitmap_Create }
+      - { name: bitmapDestroy, oh: OH_Drawing_Bitmap_Destroy }
+      - { name: bitmapGetWidth, oh: OH_Drawing_Bitmap_GetWidth }
+      - { name: bitmapGetHeight, oh: OH_Drawing_Bitmap_GetHeight }
+      - { name: bitmapSetPixel, oh: OH_Drawing_Bitmap_SetPixel }
+      - { name: bitmapGetPixel, oh: OH_Drawing_Bitmap_GetPixel }
+
+  - name: Font
+    count: 5
+    apis:
+      - { name: fontCreate, oh: OH_Drawing_Font_Create }
+      - { name: fontDestroy, oh: OH_Drawing_Font_Destroy }
+      - { name: fontSetSize, oh: OH_Drawing_Font_SetSize }
+      - { name: fontGetMetrics, oh: OH_Drawing_Font_GetMetrics }
+      - { name: fontMeasureText, oh: OH_Drawing_Font_MeasureText }
+
+  - name: Node Attributes (from ArkUI)
+    count: 2
+    note: "canvasScale + canvasConcat 补齐到 47"
+    apis:
+      - { name: canvasScale, oh: OH_Drawing_Canvas_Scale }
+      - { name: canvasConcat, oh: OH_Drawing_Canvas_ConcatMatrix }
+
+verification:
+  agent_confirmable: true
+  method: |
+    1. Mock Canvas → DrawLog 逐条验证每个 draw 操作
+    2. PNG 渲染输出 → SSIM 对比 D600 基线 (>0.90)
+    3. 性能: 单次 draw 调用 < 1ms
+  device_required: false
