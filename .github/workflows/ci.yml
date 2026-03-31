@@ -21,11 +21,14 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install build-tools
-        run: sdkmanager "build-tools;35.0.0" "platforms;android-23"
+        run: |
+          sdkmanager "build-tools;35.0.0" "platforms;android-23"
+          echo "$ANDROID_HOME/build-tools/35.0.0" >> $GITHUB_PATH
 
       - name: Test adapter — HelloWorld APK parse
         run: |
           cd demos/hello-world
+          mkdir -p build
           # Build APK from source
           aapt2 compile --dir android-res -o build/resources.zip
           aapt2 link -o build/base.apk -I $ANDROID_HOME/platforms/android-23/android.jar \
@@ -40,6 +43,7 @@ jobs:
       - name: Test adapter — Calculator APK parse
         run: |
           cd demos/calculator
+          mkdir -p build
           aapt2 compile --dir android-res -o build/resources.zip
           aapt2 link -o build/base.apk -I $ANDROID_HOME/platforms/android-23/android.jar \
             --manifest AndroidManifest.xml build/resources.zip
