@@ -14,8 +14,30 @@ import sys
 import os
 import re
 import json
+import shutil
 
-AAPT2 = "/mnt/e/10.Project/16-WestLake/16.22-HelloWorld/android-sdk/build-tools/35.0.0/aapt2"
+
+def find_aapt2() -> str:
+    """Find aapt2 binary: PATH first, then ANDROID_HOME, then common locations."""
+    # Check PATH
+    found = shutil.which("aapt2")
+    if found:
+        return found
+    # Check ANDROID_HOME
+    android_home = os.environ.get("ANDROID_HOME", "")
+    if android_home:
+        for bt in sorted(os.listdir(os.path.join(android_home, "build-tools")), reverse=True) if os.path.isdir(os.path.join(android_home, "build-tools")) else []:
+            candidate = os.path.join(android_home, "build-tools", bt, "aapt2")
+            if os.path.isfile(candidate):
+                return candidate
+    # Fallback: local SDK
+    local = os.path.join(os.path.dirname(os.path.dirname(__file__)), "android-sdk", "build-tools", "35.0.0", "aapt2")
+    if os.path.isfile(local):
+        return local
+    raise FileNotFoundError("aapt2 not found. Install Android build-tools or set ANDROID_HOME.")
+
+
+AAPT2 = find_aapt2()
 
 
 def dump_manifest(apk_path: str) -> dict:
